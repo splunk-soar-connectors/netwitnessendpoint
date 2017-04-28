@@ -7,8 +7,8 @@
   "license": "Copyright (c) Phantom Cyber Corporation 2017",
   "main_module": "netwitnessendpoint_connector.pyc",
   "type": "endpoint",
-    "app_version": "1.0.2",
-    "utctime_updated": "2017-04-20T20:18:10.000000Z",
+  "app_version": "1.0.3",
+  "utctime_updated": "",
   "product_vendor": "RSA",
   "product_name": "NetWitness Endpoint",
   "product_version_regex": ".*",
@@ -33,10 +33,18 @@
       "data_type": "password",
       "order": 2
     },
+    "max_ioc_level": {
+      "required": true,
+      "default": "1",
+      "description": "Maximum IOC level of machines and modules to ingest",
+      "data_type": "string",
+      "value_list": ["0", "1", "2", "3"],
+      "order": 3
+    },
     "verify_server_cert": {
       "description": "Verify server certificate",
       "data_type": "boolean",
-      "order": 3,
+      "order": 4,
       "default": false
     }
   },
@@ -851,11 +859,11 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "start scan",
-      "description": "Start scan of an endpoint",
-      "verbose": "Possible values for <b>scan_category</b> parameter are: <ul><li>0: None</li><li>1024: Drivers</li><li>2048: Processes</li><li>8192: Kernel Hooks</li><li>262144: Windows Hooks</li><li>524288: Autoruns</li><li>2097152: Network</li><li>4194304: Services</li><li>8388608: Image Hooks</li><li>16777216: Files</li><li>134217728: Registry Discrepancies</li><li>268435456: Dlls</li><li>536870912: Security Products</li><li>1073741824: Network Shares</li><li>2147483648: Current Users</li><li>549755813888: Loaded Files</li><li>17179869184: Tasks</li><li>8589934592: Hosts</li><li>34359738368: Suspicious Threads</li><li>4294967296: Windows Patches</li><li>618373327872: All</li></ul>",
+      "action": "scan endpoint",
+      "description": "Scan an endpoint",
+      "verbose": "Typical values for <b>scan_category</b> parameter are: <ul><li>0: None</li><li>1024: Drivers</li><li>2048: Processes</li><li>8192: Kernel Hooks</li><li>262144: Windows Hooks</li><li>524288: Autoruns</li><li>2097152: Network</li><li>4194304: Services</li><li>8388608: Image Hooks</li><li>16777216: Files</li><li>134217728: Registry Discrepancies</li><li>268435456: Dlls</li><li>536870912: Security Products</li><li>1073741824: Network Shares</li><li>2147483648: Current Users</li><li>549755813888: Loaded Files</li><li>17179869184: Tasks</li><li>8589934592: Hosts</li><li>34359738368: Suspicious Threads</li><li>4294967296: Windows Patches</li><li>618373327872: All</li></ul>",
       "type": "investigate",
-      "identifier": "start_scan",
+      "identifier": "scan_endpoint",
       "read_only": true,
       "parameters": {
         "guid": {
@@ -1014,7 +1022,7 @@
     {
       "action": "get scan data",
       "description": "Get scan data of an endpoint",
-      "verbose": "If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories.",
+      "verbose": "This action will return latest scan results. If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories.",
       "type": "investigate",
       "identifier": "get_scan_data",
       "read_only": true,
@@ -10561,7 +10569,7 @@
     {
       "action": "on poll",
       "description": "Action to ingest endpoint related information",
-      "verbose": "<p>This action ingests data for Instant IOCs with IOC level 0 & 1. Polling will ingest endpoint and modules related information for each IIOC.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>sourceAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName</td></tr><tr><td>MAC Address</td><td>MAC Artifact</td><td>sourceMacAddress</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid</td></tr><tr><td>Username</td><td>Source Username Artifact</td><td>sourceUserName</td></tr></tbody></table>",
+      "verbose": "During on poll, query all the IOCs having IOC level 0(critical) and 1(high). Containers are uniquely identified by IOC Name and its last execution time. The information of affected machines and modules of an IOC are ingested as artifacts.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, lastExecutedTime</td></tr></tbody></table>",
       "type": "ingest",
       "identifier": "on_poll",
       "read_only": true,
@@ -11992,7 +12000,7 @@
     {
       "action": "list processes",
       "description": "List the processes of an endpoint",
-      "verbose": "If <b>limit</b> parameter is 0 or not specified, the action will fetch all the processes.",
+      "verbose": "If last scan was done without scan category 'Processes', <b>list processes</b> may return empty list. If <b>limit</b> parameter is 0 or not specified, the action will fetch all the processes.",
       "type": "investigate",
       "identifier": "list_processes",
       "read_only": true,
