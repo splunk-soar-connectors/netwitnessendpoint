@@ -47,6 +47,7 @@ class NetwitnessendpointConnector(BaseConnector):
         self._username = None
         self._password = None
         self._verify_server_cert = None
+        self._max_ioc_level = None
         self._app_state = dict()
 
         return
@@ -64,6 +65,8 @@ class NetwitnessendpointConnector(BaseConnector):
         self._username = config[consts.NWENDPOINT_CONFIG_USERNAME]
         self._password = config[consts.NWENDPOINT_CONFIG_PASSWORD]
         self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, False)
+        self._max_ioc_level = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL,
+                                             consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
 
         # load the state of app stored in JSON file
         self._app_state = self.load_state()
@@ -345,7 +348,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _start_scan(self, param):
+    def _scan_endpoint(self, param):
         """ Function used to request scan of an endpoint.
 
         :param param: dictionary of input parameters
@@ -412,7 +415,7 @@ class NetwitnessendpointConnector(BaseConnector):
         payload.update(optional_params_dict)
 
         # Make the call
-        return_val, res = self._make_rest_call(consts.NWENDPOINT_START_SCAN_ENDPOINT.format(guid), action_result,
+        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(guid), action_result,
                                                data=payload)
 
         # Something went wrong
@@ -421,7 +424,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         action_result.add_data(res[consts.NWENDPOINT_REST_RESPONSE])
 
-        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_START_SCAN_MESSAGE)
+        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_SCAN_ENDPOINT_MESSAGE)
 
     def _get_scan_data(self, param):
         """ Function used to get scanned data of endpoint.
@@ -614,26 +617,24 @@ class NetwitnessendpointConnector(BaseConnector):
         """
 
         # mapping for endpoint related artifacts
-        machine_artifacts_mappings = [
-            {"field": "LocalIP", "cef": "sourceAddress", "cef_types": ["ip"], "name": "IP Artifact"},
-            {"field": "RemoteIP", "cef": "sourceAddress", "cef_types": ["ip"], "name": "IP Artifact"},
-            {"field": "MAC", "cef": "sourceMacAddress", "cef_types": ["mac address"], "name": "MAC Artifact"},
-            {"field": "UserName", "cef": "sourceUserName", "cef_types": ["user name"],
-             "name": "Source Username Artifact"},
-            {"field": "AgentID", "cef": "nweMachineGuid", "cef_types": ["nwe agent id"],
-             "name": "Endpoint Artifact"}
-        ]
+        machine_artifacts_mappings = {
+            "LocalIP": {"cef": "sourceAddress", "cef_types": ["ip"]},
+            "RemoteIP": {"cef": "remoteAddress", "cef_types": ["ip"]},
+            "MAC": {"cef": "sourceMacAddress", "cef_types": ["mac address"]},
+            "AgentID": {"cef": "nweMachineGuid", "cef_types": ["nwe agent id"]},
+            "UserName": {"cef": "sourceUserName", "cef_types": ["user name"]}
+        }
 
         # mapping for files related artifacts
-        module_artifacts_mappings = [
-            {"field": "MD5", "cef": "fileHashMd5", "cef_types": ["hash", "md5"], "name": "File Artifact"},
-            {"field": "SHA1", "cef": "fileHashSha1", "cef_types": ["hash", "sha1"], "name": "File Artifact"},
-            {"field": "SHA256", "cef": "fileHashSha256", "cef_types": ["hash", "sha256"], "name": "File Artifact"},
-            {"field": "FileName", "cef": "fileName", "cef_types": ["file name"], "name": "File Artifact"}
-        ]
+        module_artifacts_mappings = {
+            "MD5": {"cef": "fileHashMd5", "cef_types": ["hash", "md5"]},
+            "SHA1": {"cef": "fileHashSha1", "cef_types": ["hash", "sha1"]},
+            "SHA256": {"cef": "fileHashSha256", "cef_types": ["hash", "sha256"]},
+            "FileName": {"cef": "fileName", "cef_types": ["file name"]}
+        }
 
         # mapping of IOCScore with severity of artifacts
-        phantom_severity_mapping = {"0": "high", "1": "medium"}
+        phantom_severity_mapping = {"0": "high", "1": "medium", "2": "low", "3": "low"}
 
         # Creating container for each IOC query and creating its artifacts
         for ioc in ioc_query_list:
@@ -657,67 +658,105 @@ class NetwitnessendpointConnector(BaseConnector):
 
             # Creating endpoint related artifacts
             for machine in ioc["iocMachines"]:
-                for artifact_item in machine_artifacts_mappings:
+                cef = {}
+                cef_types = {}
+                for field, artifact_details in machine_artifacts_mappings.iteritems():
+                    # if field value is present
+                    if machine.get(field):
+                        cef_value = machine[field]
 
-                    # if value is not present for the field skip creation of artifact
-                    if not machine[artifact_item["field"]]:
-                        continue
+                        cef[artifact_details["cef"]] = cef_value
+                        cef_types[artifact_details["cef"]] = artifact_details["cef_types"]
 
-                    artifact = {
-                        "name": artifact_item["name"], "description": consts.NWENDPOINT_ARTIFACTS_DESC,
-                        "cef_types": {artifact_item["cef"]: artifact_item["cef_types"]},
-                        "cef": {artifact_item["cef"]: machine[artifact_item["field"]]},
-                        "container_id": container_id,
-                        "severity": phantom_severity_mapping[ioc["IOCLevel"]],
-                    }
+                # if no fields found
+                if not cef:
+                    continue
 
-                    # ignoring same artifacts based on hash
-                    source_data_identifier = self._create_dict_hash(artifact)
-                    if source_data_identifier in source_data_identifiers:
-                        continue
+                artifact = {
+                    "name": "Endpoint Artifact",
+                    "description": consts.NWENDPOINT_ARTIFACTS_DESC,
+                    "cef_types": cef_types,
+                    "cef": cef,
+                    "container_id": container_id,
+                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                }
 
-                    source_data_identifiers.append(source_data_identifier)
+                # ignoring same artifacts based on hash
+                source_data_identifier = self._create_dict_hash(artifact)
+                if source_data_identifier in source_data_identifiers:
+                    continue
 
-                    # The source_data_identifier should be created after all the keys have been set
-                    artifact['source_data_identifier'] = source_data_identifier
-                    ret_value, status_string, artifact_id = self.save_artifact(artifact)
+                source_data_identifiers.append(source_data_identifier)
 
-                    # Something went wrong while creating artifacts
-                    if phantom.is_fail(ret_value):
-                        self.debug_print(status_string, artifact)
-                        continue
+                # The source_data_identifier should be created after all the keys have been set
+                artifact['source_data_identifier'] = source_data_identifier
+                ret_value, status_string, artifact_id = self.save_artifact(artifact)
+
+                # Something went wrong while creating artifacts
+                if phantom.is_fail(ret_value):
+                    self.debug_print(status_string, artifact)
+                    continue
 
             # Creating module(file) related artifacts
             for machine_module in ioc["iocModules"]:
-                for artifact_item in module_artifacts_mappings:
+                cef = {}
+                cef_types = {}
 
-                    # if value is not present for the field skip creation of artifact
-                    if not machine_module[artifact_item["field"]]:
-                        continue
+                for field, artifact_details in module_artifacts_mappings.iteritems():
+                    # if field value is present
+                    if machine_module.get(field):
+                        cef_value = machine_module[field]
 
-                    artifact = {
-                        "name": artifact_item["name"], "description": consts.NWENDPOINT_ARTIFACTS_DESC,
-                        "cef_types": {artifact_item["cef"]: artifact_item["cef_types"]},
-                        "cef": {artifact_item["cef"]: machine_module[artifact_item["field"]]},
-                        "container_id": container_id,
-                        "severity": phantom_severity_mapping[ioc["IOCLevel"]],
-                    }
+                        cef[artifact_details["cef"]] = cef_value
+                        cef_types[artifact_details["cef"]] = artifact_details["cef_types"]
 
-                    # ignoring same artifacts based on hash
-                    source_data_identifier = self._create_dict_hash(artifact)
-                    if source_data_identifier in source_data_identifiers:
-                        continue
+                # if no fields found
+                if not cef:
+                    continue
 
-                    source_data_identifiers.append(source_data_identifier)
+                artifact = {
+                    "name": "File Artifact", "description": consts.NWENDPOINT_ARTIFACTS_DESC,
+                    "cef_types": cef_types,
+                    "cef": cef,
+                    "container_id": container_id,
+                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                }
 
-                    # The source_data_identifier should be created after all the keys have been set.
-                    artifact['source_data_identifier'] = source_data_identifier
-                    ret_value, status_string, artifact_id = self.save_artifact(artifact)
+                # ignoring same artifacts based on hash
+                source_data_identifier = self._create_dict_hash(artifact)
+                if source_data_identifier in source_data_identifiers:
+                    continue
 
-                    # Something went wrong while creating artifacts
-                    if phantom.is_fail(ret_value):
-                        self.debug_print(status_string, artifact)
-                        continue
+                source_data_identifiers.append(source_data_identifier)
+
+                # The source_data_identifier should be created after all the keys have been set.
+                artifact['source_data_identifier'] = source_data_identifier
+                ret_value, status_string, artifact_id = self.save_artifact(artifact)
+
+                # Something went wrong while creating artifacts
+                if phantom.is_fail(ret_value):
+                    self.debug_print(status_string, artifact)
+                    continue
+
+            # Adding IIOC details as artifact
+            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"]}
+
+            cef_types = {"instantIocName": ["nwe ioc name"]}
+
+            artifact = {
+                "name": "Instant IOC Artifact", "description": consts.NWENDPOINT_ARTIFACTS_DESC,
+                "cef_types": cef_types,
+                "cef": cef,
+                "container_id": container_id,
+                "run_automation": True
+            }
+            artifact['source_data_identifier'] = self._create_dict_hash(artifact)
+            ret_value, status_string, artifact_id = self.save_artifact(artifact)
+
+            # Something went wrong while creating artifacts
+            if phantom.is_fail(ret_value):
+                self.debug_print(status_string, artifact)
+                continue
 
     def get_machine_data(self, action_result, ioc_query_list):
         """ Function used to obtain endpoint data for each query in ioc_query_list.
@@ -728,6 +767,7 @@ class NetwitnessendpointConnector(BaseConnector):
         """
 
         machines_modules_ioc = {}
+        ioc_level_mapping = {"0": 1024, "1": 128, "2": 8, "3": 1}
 
         if self.is_poll_now():
             self.save_progress("Ignoring maximum artifact count")
@@ -767,6 +807,9 @@ class NetwitnessendpointConnector(BaseConnector):
                 if phantom.is_fail(ret_value):
                     return action_result.get_status()
 
+            if not ioc_machines:
+                continue
+
             ioc['iocMachines'] = ioc_machines
             ioc['iocModules'] = []
 
@@ -778,8 +821,9 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Checking if modules of the machines are already cached
                 if guid not in machines_modules_ioc.keys():
 
-                    # get modules whose IOC score is greater than 128 which indicates IOC lever 0 or 1
-                    params = {"iocscore_gte": 128}
+                    # IOC Score is dependent on IOC Level
+                    # providing IOC Score to get modules
+                    params = {"iocscore_gte": ioc_level_mapping[str(self._max_ioc_level)]}
                     module_ioc = []
 
                     # Get all modules of machines
@@ -806,8 +850,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
                         module_ioc += response
 
-                        # filtering IOCs whose IOC level is 0 or 1
-                        module_ioc = [module for module in module_ioc if module["IOCLevel"] in ["0", "1"]]
+                        # filtering IOCs whose IOC level is equal to or less than max IOC level
+                        module_ioc = [module for module in module_ioc if int(module["IOCLevel"]) <= self._max_ioc_level]
 
                     # caching modules response to be used if same machine is listed in another IOC
                     machines_modules_ioc[guid] = module_ioc
@@ -816,6 +860,8 @@ class NetwitnessendpointConnector(BaseConnector):
                 ioc['iocModules'] += [machine_module for machine_module in machines_modules_ioc[guid]
                                       if machine_module["IOCName"] == ioc["Name"]]
 
+        ioc_query_list = [ioc for ioc in ioc_query_list if ioc.get('iocMachines')]
+        self.save_progress("Total number of IOCs retrieved to ingest: {}".format(len(ioc_query_list)))
         self.ingest_data(ioc_query_list)
 
         return phantom.APP_SUCCESS
@@ -867,13 +913,11 @@ class NetwitnessendpointConnector(BaseConnector):
                     ioc_queries += [response[consts.NWENDPOINT_REST_RESPONSE].get('iocQuery')]
 
         # Filter IOCs
-        instant_iocs = [ioc for ioc in ioc_queries if ioc['IOCLevel'] in ["0", "1"] and (ioc['MachineCount'] != '0' or
-                                                                                         ioc['ModuleCount'] != '0')]
+        instant_iocs = [ioc for ioc in ioc_queries if int(ioc['IOCLevel']) <= self._max_ioc_level and
+                        (ioc['MachineCount'] != '0' or ioc['ModuleCount'] != '0')]
 
         # Get list of IOCs equal to or less then the specified container count
         instant_iocs = instant_iocs[:container_count]
-
-        self.save_progress("Total number of IOCs retrieved to ingest: {}".format(len(instant_iocs)))
 
         if instant_iocs:
             response_status = self.get_machine_data(action_result, instant_iocs)
@@ -933,7 +977,7 @@ class NetwitnessendpointConnector(BaseConnector):
             'get_scan_data': self._get_scan_data,
             'list_endpoints': self._list_endpoints,
             'blacklist_ip': self._blacklist_ip,
-            'start_scan': self._start_scan,
+            'scan_endpoint': self._scan_endpoint,
             'get_system_info': self._get_system_info,
             'get_ioc': self._get_ioc,
             'test_asset_connectivity': self._test_asset_connectivity,
