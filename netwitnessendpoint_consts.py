@@ -18,6 +18,7 @@ NWENDPOINT_CONFIG_PASSWORD = "password"
 NWENDPOINT_CONFIG_VERIFY_SSL = "verify_server_cert"
 NWENDPOINT_CONFIG_MAX_IOC_LEVEL = "max_ioc_level"
 NWENDPOINT_DEFAULT_IOC_LEVEL = 2
+NWENDPOINT_LIST_SCAN_CATEGORY_ENDPOINT = "/api/v2/scancategory"
 NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT = "/api/v2/auth/credentials?format=json"
 NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
 NWENDPOINT_BLOCK_IP_ENDPOINT = "/api/v2/blacklist/ip?format=json"

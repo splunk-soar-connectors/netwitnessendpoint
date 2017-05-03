@@ -29,6 +29,15 @@ def _get_ctx_result(result, provides):
     summary = result.get_summary()
     data = result.get_data()
 
+    ctx_result['param'] = param
+
+    if summary:
+        ctx_result['summary'] = summary
+
+    if not data:
+        ctx_result['data'] = {}
+        return ctx_result
+
     if provides == 'get scan data':
 
         # First number in list represents the number of items and second number represents key with non zero IIOC Score
@@ -47,15 +56,6 @@ def _get_ctx_result(result, provides):
                 count_dict[item][1] = count_dict[item][0] - count
 
         ctx_result['count_dict'] = count_dict
-
-    ctx_result['param'] = param
-
-    if summary:
-        ctx_result['summary'] = summary
-
-    if not data:
-        ctx_result['data'] = {}
-        return ctx_result
 
     ctx_result['data'] = data[0]
 
