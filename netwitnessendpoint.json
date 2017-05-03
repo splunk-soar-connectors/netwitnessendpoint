@@ -21,17 +21,23 @@
       "data_type": "string",
       "order": 0
     },
+    "verify_server_cert": {
+      "description": "Verify server certificate",
+      "data_type": "boolean",
+      "order": 1,
+      "default": false
+    },
     "username": {
       "required": true,
       "description": "Username",
       "data_type": "string",
-      "order": 1
+      "order": 2
     },
     "password": {
       "required": true,
       "description": "Password",
       "data_type": "password",
-      "order": 2
+      "order": 3
     },
     "max_ioc_level": {
       "required": true,
@@ -39,13 +45,7 @@
       "description": "Maximum IOC level of machines and modules to ingest",
       "data_type": "string",
       "value_list": ["0", "1", "2", "3"],
-      "order": 3
-    },
-    "verify_server_cert": {
-      "description": "Verify server certificate",
-      "data_type": "boolean",
-      "order": 4,
-      "default": false
+      "order": 4
     }
   },
   "actions": [
@@ -72,7 +72,7 @@
           "order": 0,
           "data_type": "string",
           "contains": [
-            "domain"
+            "domain", "url"
           ],
           "primary": true
         }
@@ -87,8 +87,6 @@
         {
           "data_path": "action_result.data.*.domain",
           "data_type": "string",
-          "column_name": "Domain",
-          "column_order": 0,
           "contains": [
             "domain"
           ]
@@ -97,7 +95,7 @@
           "data_path": "action_result.status",
           "data_type": "string",
           "column_name": "Status",
-          "column_order": 2
+          "column_order": 1
         },
         {
           "data_path": "action_result.message",
@@ -106,8 +104,10 @@
         {
           "data_path": "action_result.parameter.domain",
           "data_type": "string",
+          "column_name": "Domain",
+          "column_order": 0,
           "contains": [
-            "domain"
+            "domain", "url"
           ]
         },
         {
@@ -149,8 +149,6 @@
         {
           "data_path": "action_result.data.*.ip",
           "data_type": "string",
-          "column_name": "IP",
-          "column_order": 0,
           "contains": [
             "ip"
           ]
@@ -159,7 +157,7 @@
           "data_path": "action_result.status",
           "data_type": "string",
           "column_name": "Status",
-          "column_order": 2
+          "column_order": 1
         },
         {
           "data_path": "action_result.message",
@@ -168,6 +166,8 @@
         {
           "data_path": "action_result.parameter.ip",
           "data_type": "string",
+          "column_name": "IP",
+          "column_order": 0,
           "contains": [
             "ip"
           ]
@@ -221,9 +221,9 @@
           "data_path": "action_result.data.*.Items.*.Id",
           "data_type": "string",
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ],
-          "column_name": "Agent ID",
+          "column_name": "Machine GUID",
           "column_order": 0
         },
         {
@@ -287,12 +287,12 @@
       "read_only": true,
       "parameters": {
         "guid": {
-          "description": "Machine guid",
+          "description": "Machine GUID",
           "order": 0,
           "data_type": "string",
           "required": true,
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ],
           "primary": true
         }
@@ -355,10 +355,8 @@
           "data_path": "action_result.data.*.Machine.AgentID",
           "data_type": "string",
           "contains": [
-            "nwe agent id"
-          ],
-          "column_name": "Agent ID",
-          "column_order": 2
+            "nwe machine guid"
+          ]
         },
         {
           "data_path": "action_result.data.*.Machine.Comment",
@@ -837,7 +835,9 @@
         {
           "data_path": "action_result.parameter.guid",
           "data_type": "string",
-          "contains": [ "nwe agent id" ]
+          "contains": [ "nwe machine guid" ],
+          "column_name": "Machine GUID",
+          "column_order": 2
         },
         {
           "data_path": "action_result.summary.machine_name",
@@ -867,12 +867,12 @@
       "read_only": true,
       "parameters": {
         "guid": {
-          "description": "Machine guid",
+          "description": "Machine GUID",
           "order": 0,
           "data_type": "string",
           "required": true,
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ],
           "primary": true
         },
@@ -936,7 +936,7 @@
         "width": 12,
         "height": 5,
         "type": "table",
-        "title": "Start Scan"
+        "title": "Scan Endpoint"
       },
       "output": [
         {
@@ -962,15 +962,15 @@
         {
           "data_path": "action_result.parameter.guid",
           "data_type": "string",
-          "column_name": "Guid",
+          "column_name": "Machine GUID",
           "column_order": 0,
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ]
         },
         {
           "data_path": "action_result.parameter.scan_category",
-          "data_type": "string"
+          "data_type": "numeric"
         },
         {
           "data_path": "action_result.parameter.capture_floating_code",
@@ -1022,19 +1022,19 @@
     {
       "action": "get scan data",
       "description": "Get scan data of an endpoint",
-      "verbose": "This action will return latest scan results. If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories.",
+      "verbose": "This action will return latest scan results. If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category if limit specified is greater then the available data, the action will fetch all data for that category.",
       "type": "investigate",
       "identifier": "get_scan_data",
       "read_only": true,
       "parameters": {
         "guid": {
-          "description": "Machine guid",
+          "description": "Machine GUID",
           "required": true,
           "order": 0,
           "data_type": "string",
           "primary": true,
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ]
         },
         "limit": {
@@ -10496,7 +10496,7 @@
           "data_path": "action_result.parameter.guid",
           "data_type": "string",
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ]
         },
         {
@@ -11507,7 +11507,7 @@
           "data_path": "action_result.data.*.iocMachines.*.AgentID",
           "data_type": "string",
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ]
         },
         {
@@ -12000,18 +12000,18 @@
     {
       "action": "list processes",
       "description": "List the processes of an endpoint",
-      "verbose": "If last scan was done without scan category 'Processes', <b>list processes</b> may return empty list. If <b>limit</b> parameter is 0 or not specified, the action will fetch all the processes.",
+      "verbose": "If last scan was done without scan category 'Processes', <b>list processes</b> may return empty list. If <b>limit</b> parameter is 0 or not specified, the action will fetch all the processes and for any other valid value, the action will fetch processes equal to the limit specified. If limit specified is greater then the available processes, the action will fetch all processes.",
       "type": "investigate",
       "identifier": "list_processes",
       "read_only": true,
       "parameters": {
         "guid": {
           "required": true,
-          "description": "Guid of machine",
+          "description": "Machine GUID",
           "order": 0,
           "data_type": "string",
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ],
           "primary": true
         },
@@ -12911,7 +12911,7 @@
           "data_path": "action_result.parameter.guid",
           "data_type": "string",
           "contains": [
-            "nwe agent id"
+            "nwe machine guid"
           ]
         },
         {

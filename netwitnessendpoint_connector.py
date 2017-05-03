@@ -73,7 +73,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post"):
+    def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
         """ Function that makes the REST call to the device. It is a generic function that can be called from various
         action handlers.
 
@@ -101,8 +101,13 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Make the call
         try:
-            response = request_func("{}{}".format(self._url, endpoint), data=data, params=params,
-                                    auth=(self._username, self._password), verify=self._verify_server_cert)
+            if timeout is not None:
+                response = request_func("{}{}".format(self._url, endpoint), data=data, params=params,
+                                        auth=(self._username, self._password), verify=self._verify_server_cert,
+                                        timeout=timeout)
+            else:
+                response = request_func("{}{}".format(self._url, endpoint), data=data, params=params,
+                                        auth=(self._username, self._password), verify=self._verify_server_cert)
         except Exception as e:
             self.debug_print(consts.NWENDPOINT_ERR_SERVER_CONNECTION, e)
             # set the action_result status to error, the handler function will most probably return as is
@@ -111,8 +116,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Try parsing the json
         try:
-            content_type = response.headers['content-type']
-            if content_type.find('json') != -1:
+            content_type = response.headers.get('content-type')
+            if content_type and content_type.find('json') != -1:
                 response_data = response.json()
             else:
                 response_data = response.text
@@ -219,8 +224,14 @@ class NetwitnessendpointConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        domain = param[consts.NWENDPOINT_JSON_DOMAIN]
+
+        # Convert URL to domain
+        if phantom.is_url(domain):
+            domain = phantom.get_host_from_url(domain)
+
         # Get mandatory parameter
-        payload = {'Domains': [param[consts.NWENDPOINT_JSON_DOMAIN]]}
+        payload = {'Domains': [domain]}
 
         # Make the call
         return_val, response = self._make_rest_call(consts.NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT, action_result,
@@ -621,7 +632,7 @@ class NetwitnessendpointConnector(BaseConnector):
             "LocalIP": {"cef": "sourceAddress", "cef_types": ["ip"]},
             "RemoteIP": {"cef": "remoteAddress", "cef_types": ["ip"]},
             "MAC": {"cef": "sourceMacAddress", "cef_types": ["mac address"]},
-            "AgentID": {"cef": "nweMachineGuid", "cef_types": ["nwe agent id"]},
+            "MachineGUID": {"cef": "nweMachineGuid", "cef_types": ["nwe machine guid"]},
             "UserName": {"cef": "sourceUserName", "cef_types": ["user name"]}
         }
 
@@ -739,7 +750,8 @@ class NetwitnessendpointConnector(BaseConnector):
                     continue
 
             # Adding IIOC details as artifact
-            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"]}
+            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"],
+                   "iocLevel": ioc["IOCLevel"], "osType": ioc["Type"]}
 
             cef_types = {"instantIocName": ["nwe ioc name"]}
 
@@ -952,7 +964,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # making call
         ret_value, response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result,
-                                                   data=data)
+                                                   data=data, timeout=30)
 
         # something went wrong
         if phantom.is_fail(ret_value):
