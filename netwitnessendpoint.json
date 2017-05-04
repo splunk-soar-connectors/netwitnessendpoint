@@ -7,7 +7,7 @@
   "license": "Copyright (c) Phantom Cyber Corporation 2017",
   "main_module": "netwitnessendpoint_connector.pyc",
   "type": "endpoint",
-  "app_version": "1.0.5",
+  "app_version": "1.0.6",
   "utctime_updated": "",
   "product_vendor": "RSA",
   "product_name": "NetWitness Endpoint",
