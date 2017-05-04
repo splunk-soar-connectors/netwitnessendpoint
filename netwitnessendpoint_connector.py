@@ -509,6 +509,71 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return hashlib.md5(input_dict_str).hexdigest()
 
+    def _list_ioc(self, param):
+        """ Function used to List available IOCs.
+
+        :param param: dictionary of input parameters
+        :return: status success/failure
+        """
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        summary_data = action_result.update_summary({})
+
+        # get optional input parameter to filter response
+        machine_count = param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT)
+        module_count = param.get(consts.NWENDPOINT_JSON_MODULE_COUNT)
+        ioc_level = param.get(consts.NWENDPOINT_JSON_IOC_LEVEL)
+        limit = param.get(consts.NWENDPOINT_JSON_LIMIT)
+
+        # Validate that limit is positive integer
+        if limit:
+            if not limit.isdigit():
+                self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
+                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
+
+        # Validate that MachineCount is positive integer
+        if machine_count:
+            if not machine_count.isdigit():
+                self.debug_print(consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
+                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
+
+        # Validate that ModuleCount is positive integer
+        if module_count:
+            if not module_count.isdigit():
+                self.debug_print(consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
+                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
+
+        # Validate that IOCLevel is positive integer
+        if ioc_level:
+            if not ioc_level.isdigit():
+                self.debug_print(consts.NWENDPOINT_JSON_INVALID_IOC_LEVEL)
+                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_IOC_LEVEL)
+
+        # Make the call
+        ret_value, response = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result,
+                                                           "iocQueries", limit=limit)
+        # something went wrong
+        if phantom.is_fail(ret_value):
+            return action_result.get_status()
+
+        # Filter IOCs
+        if ioc_level:
+            response = [iocs for iocs in response if int(iocs['IOCLevel']) <= int(ioc_level)]
+
+        if machine_count:
+            response = [machines for machines in response if int(machines['MachineCount']) >= int(machine_count)]
+
+        if module_count:
+            response = [modules for modules in response if int(modules['ModuleCount']) >= int(module_count)]
+
+        for ioc in response:
+            action_result.add_data(ioc)
+
+        # Update summary data
+        summary_data['available_iocs'] = len(response)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _get_ioc(self, param):
         """ Get IOC detail.
 
@@ -994,7 +1059,8 @@ class NetwitnessendpointConnector(BaseConnector):
             'get_ioc': self._get_ioc,
             'test_asset_connectivity': self._test_asset_connectivity,
             'on_poll': self._on_poll,
-            'list_processes': self._list_processes
+            'list_processes': self._list_processes,
+            'list_ioc': self._list_ioc
         }
 
         action = self.get_action_identifier()

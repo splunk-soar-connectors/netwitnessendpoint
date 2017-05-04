@@ -7,8 +7,8 @@
   "license": "Copyright (c) Phantom Cyber Corporation 2017",
   "main_module": "netwitnessendpoint_connector.pyc",
   "type": "endpoint",
-    "app_version": "1.0.5",
-    "utctime_updated": "2017-05-03T17:50:54.000000Z",
+  "app_version": "1.0.5",
+  "utctime_updated": "",
   "product_vendor": "RSA",
   "product_name": "NetWitness Endpoint",
   "product_version_regex": ".*",
@@ -10569,7 +10569,7 @@
     {
       "action": "on poll",
       "description": "Action to ingest endpoint related information",
-      "verbose": "During on poll, query all the IOCs having IOC level 0(critical) and 1(high). Containers are uniquely identified by IOC Name and its last execution time. The information of affected machines and modules of an IOC are ingested as artifacts.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, lastExecutedTime</td></tr></tbody></table>",
+      "verbose": "During on poll, query all the IOCs having IOC level <b>max_ioc_level</b>. Containers are uniquely identified by IOC Name and its last execution time. The information of affected machines and modules of an IOC are ingested as artifacts.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, lastExecutedTime</td></tr></tbody></table>",
       "type": "ingest",
       "identifier": "on_poll",
       "read_only": true,
@@ -10608,6 +10608,162 @@
         "title": "On Poll"
       },
       "output": [],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "list ioc",
+      "description": "List IOC",
+      "type": "investigate",
+      "identifier": "list_ioc",
+      "read_only": true,
+      "parameters": {
+        "machine_count": {
+          "description": "Minimum IOC machines",
+          "order": 0,
+          "data_type": "numeric"
+        },
+        "module_count": {
+          "description": "Minimum IOC modules",
+          "order": 1,
+          "data_type": "numeric"
+        },
+        "ioc_level": {
+          "description": "Maximum IOC level",
+          "order": 2,
+          "data_type": "numeric"
+        },
+        "limit": {
+          "description": "Maximum number of IOCs to retrieve",
+          "order": 3,
+          "data_type": "numeric",
+          "default": 50
+        }
+      },
+      "render": {
+        "width": 12,
+        "height": 5,
+        "type": "custom",
+        "title": "List IOC",
+        "view": "netwitnessendpoint_view.display_list_of_ioc"
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.Name",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Type",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Query",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Active",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.IOCLevel",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Priority",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Alertable",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Persistent",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Description",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.ModuleCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.UserDefined",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.ErrorMessage",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.LastExecuted",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.MachineCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.GraylistedCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.BlacklistedCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.WhitelistedCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.LastExecutionDuration",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.EvaluationMachineCount",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.LastEvaluationDuration",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.limit",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.ioc_level",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.module_count",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.machine_count",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.available_iocs",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
       "versions": "EQ(*)"
     },
     {
