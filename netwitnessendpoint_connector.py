@@ -649,42 +649,6 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _list_processes(self, param):
-        """ Function used to get processes of an endpoint.
-
-        :param param: dictionary of input parameters
-        :return: status success/failure
-        """
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-        summary_data = action_result.update_summary({})
-
-        # Get mandatory parameter
-        guid = param[consts.NWENDPOINT_JSON_GUID]
-
-        # Get optional parameter
-        limit = param.get(consts.NWENDPOINT_JSON_LIMIT)
-
-        # Validate that limit is positive integer
-        if limit:
-            if not limit.isdigit():
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
-
-        # Get processes
-        ret_value, response = self._paginate_response_data(
-            consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(guid, 'processes'), action_result, "Processes", limit=limit)
-
-        # Something went wrong
-        if phantom.is_fail(ret_value):
-            return action_result.get_status()
-
-        # Update summary data and add response in action_result
-        summary_data['total_processes'] = len(response)
-        action_result.add_data({"Processes": response})
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def ingest_data(self, ioc_query_list):
         """ Function used to create containers and artifacts from the provided ioc_query_list.
 
@@ -1025,11 +989,9 @@ class NetwitnessendpointConnector(BaseConnector):
         self.save_progress(consts.NWENDPOINT_CONNECTION_TEST_MSG)
         self.save_progress("Configured URL: {}".format(self._url))
 
-        data = {"username": self._username, "password": self._password}
-
         # making call
         ret_value, response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result,
-                                                   data=data, timeout=30)
+                                                   method="get", timeout=30)
 
         # something went wrong
         if phantom.is_fail(ret_value):
@@ -1059,7 +1021,6 @@ class NetwitnessendpointConnector(BaseConnector):
             'get_ioc': self._get_ioc,
             'test_asset_connectivity': self._test_asset_connectivity,
             'on_poll': self._on_poll,
-            'list_processes': self._list_processes,
             'list_ioc': self._list_ioc
         }
 

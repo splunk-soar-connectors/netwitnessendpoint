@@ -93,21 +93,6 @@ def display_scan_data(provides, all_app_runs, context):
     return 'netwitnessendpoint_display_scan_data.html'
 
 
-def display_list_processes(provides, all_app_runs, context):
-    """  This function is used to create the context dictionary that the template code can use to render the data.
-    """
-    context['results'] = results = []
-
-    for summary, action_results in all_app_runs:
-        for result in action_results:
-            ctx_result = _get_ctx_result(result, provides)
-            if not ctx_result:
-                continue
-            results.append(ctx_result)
-
-    return 'netwitnessendpoint_display_list_processes.html'
-
-
 def display_list_of_ioc(provides, all_app_runs, context):
     """  This function is used to create the context dictionary that the template code can use to render the data.
     """
