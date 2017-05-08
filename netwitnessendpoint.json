@@ -1022,7 +1022,7 @@
     {
       "action": "get scan data",
       "description": "Get scan data of an endpoint",
-      "verbose": "This action will return latest scan results. If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category, if limit specified is greater than the available data, the action will fetch all data for that category.",
+      "verbose": "This action will return latest scan results. If latest scan was done with specific category, the resulting scan results may not contain data of all categories. If <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category, if limit specified is greater than the available data, the action will fetch all data for that category.",
       "type": "investigate",
       "identifier": "get_scan_data",
       "read_only": true,
@@ -10566,7 +10566,7 @@
     {
       "action": "on poll",
       "description": "Action to ingest endpoint related information",
-      "verbose": "During on poll, query all the IOCs having IOC level <b>max_ioc_level</b> whose machine count and module count is greater than 0. The IOCs fetched are not ordered with respect to time. Containers are uniquely identified by IOC Name and its last execution time. The information of affected machines and modules of an IOC are ingested as artifacts. The number of IOCs ingested can be controlled by <b>container_count</b>.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, lastExecutedTime</td></tr></tbody></table>",
+      "verbose": "During on poll, query all the IOCs having IOC level <b>max_ioc_level</b> whose machine count and module count is greater than 0. The IOCs fetched are not ordered with respect to time. Containers are uniquely identified by IOC Name and its last execution time. The information of affected machines and modules of an IOC are ingested as artifacts. The number of IOCs ingested can be controlled by <b>container_count</b>.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName, iiocScore, riskScore</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress, iiocScore</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, iocLevel, lastExecutedTime, osType</td></tr></tbody></table>",
       "type": "ingest",
       "identifier": "on_poll",
       "read_only": true,
