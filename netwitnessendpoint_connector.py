@@ -661,8 +661,9 @@ class NetwitnessendpointConnector(BaseConnector):
             "LocalIP": {"cef": "sourceAddress", "cef_types": ["ip"]},
             "RemoteIP": {"cef": "remoteAddress", "cef_types": ["ip"]},
             "MAC": {"cef": "sourceMacAddress", "cef_types": ["mac address"]},
-            "MachineGUID": {"cef": "nweMachineGuid", "cef_types": ["nwe machine guid"]},
-            "UserName": {"cef": "sourceUserName", "cef_types": ["user name"]}
+            "AgentID": {"cef": "nweMachineGuid", "cef_types": ["nwe machine guid"]},
+            "UserName": {"cef": "sourceUserName", "cef_types": ["user name"]},
+            "IIOCScore": {"cef": "iiocScore", "cef_types": []}
         }
 
         # mapping for files related artifacts
@@ -670,7 +671,9 @@ class NetwitnessendpointConnector(BaseConnector):
             "MD5": {"cef": "fileHashMd5", "cef_types": ["hash", "md5"]},
             "SHA1": {"cef": "fileHashSha1", "cef_types": ["hash", "sha1"]},
             "SHA256": {"cef": "fileHashSha256", "cef_types": ["hash", "sha256"]},
-            "FileName": {"cef": "fileName", "cef_types": ["file name"]}
+            "FileName": {"cef": "fileName", "cef_types": ["file name"]},
+            "RiskScore": {"cef": "riskScore", "cef_types": []},
+            "IIOCScore": {"cef": "iiocScore", "cef_types": []}
         }
 
         # mapping of IOCScore with severity of artifacts
@@ -681,7 +684,7 @@ class NetwitnessendpointConnector(BaseConnector):
             source_data_identifiers = []
             # Creating container
             container = {
-                "name": "{}_{}".format(ioc["Name"], ioc["LastExecuted"]),
+                "name": "{}-{}".format(ioc["Name"], ioc["Type"]),
                 "description": ioc["Description"],
                 "data": ioc,
                 "source_data_identifier": "{}_{}".format(ioc["Name"], ioc["LastExecuted"])
