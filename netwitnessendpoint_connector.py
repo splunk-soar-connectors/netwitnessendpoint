@@ -292,7 +292,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that ioc_score_gte is positive integer if provided and update params dict
         if ioc_score_gte:
-            if ioc_score_gte.isdigit():
+            if str(ioc_score_gte).isdigit():
                 params[consts.NWENDPOINT_JSON_IOC_SCORE_GTE] = int(ioc_score_gte)
             else:
                 self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
@@ -300,7 +300,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that ioc_score_lte is positive integer if provided and update params dict
         if ioc_score_lte:
-            if ioc_score_lte.isdigit():
+            if str(ioc_score_lte).isdigit():
                 params[consts.NWENDPOINT_JSON_IOC_SCORE_LTE] = int(ioc_score_lte)
             else:
                 self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
@@ -308,7 +308,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that limit is positive integer if provided and update params dict
         if limit:
-            if limit.isdigit():
+            if str(limit).isdigit():
                 ret_value, response = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
                                                                    action_result, "Items", params=param,
                                                                    limit=limit)
@@ -388,7 +388,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that cpu_max is positive integer and update the request parameters
         if cpu_max:
-            if cpu_max.isdigit():
+            if str(cpu_max).isdigit():
                 payload["CpuMax"] = int(cpu_max)
             else:
                 self.debug_print(consts.NWENDPOINT_JSON_CPU_MAX_ERROR)
@@ -396,7 +396,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that cpu_max is positive integer and update the request parameters
         if cpu_max_vm:
-            if cpu_max_vm.isdigit():
+            if str(cpu_max_vm).isdigit():
                 payload["CpuMaxVm"] = int(cpu_max_vm)
             else:
                 self.debug_print(consts.NWENDPOINT_JSON_CPU_MAX_VM_ERROR)
@@ -404,7 +404,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that cpu_min is positive integer and update the request parameters
         if cpu_min:
-            if cpu_min.isdigit():
+            if str(cpu_min).isdigit():
                 payload["CpuMin"] = int(cpu_min)
             else:
                 self.debug_print(consts.NWENDPOINT_JSON_CPU_MIN_ERROR)
@@ -459,7 +459,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that limit is positive integer
         if limit:
-            if not limit.isdigit():
+            if not str(limit).isdigit():
                 self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
                 return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
 
@@ -527,25 +527,25 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Validate that limit is positive integer
         if limit:
-            if not limit.isdigit():
+            if not str(limit).isdigit():
                 self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
                 return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
 
         # Validate that MachineCount is positive integer
         if machine_count:
-            if not machine_count.isdigit():
+            if not str(machine_count).isdigit():
                 self.debug_print(consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
                 return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
 
         # Validate that ModuleCount is positive integer
         if module_count:
-            if not module_count.isdigit():
+            if not str(module_count).isdigit():
                 self.debug_print(consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
                 return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
 
         # Validate that IOCLevel is positive integer
         if ioc_level:
-            if not ioc_level.isdigit():
+            if not str(ioc_level).isdigit():
                 self.debug_print(consts.NWENDPOINT_JSON_INVALID_IOC_LEVEL)
                 return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_IOC_LEVEL)
 
@@ -612,7 +612,7 @@ class NetwitnessendpointConnector(BaseConnector):
             return action_result.get_status()
 
         # maintaining modules that are categorized in given IOC
-        ioc_module = []
+        ioc_modules = []
 
         # for each machines in IOC get all modules of that machine
         for machine in machines:
@@ -640,10 +640,13 @@ class NetwitnessendpointConnector(BaseConnector):
                     return action_result.get_status()
 
                 # if module belongs to given IOC, add it into the list
-                ioc_module += [ioc for ioc in module_iocs if ioc['IOCName'] == name]
+                ioc_modules += [ioc for ioc in module_iocs if ioc['IOCName'] == name]
+
+        ioc_modules = [dict(module_data) for module_data in set(tuple(ioc_module.items())
+                                                                for ioc_module in ioc_modules)]
 
         # Adding details of IOC, its machines and modules in action result
-        response = {"iocQuery": ioc_query, "iocMachines": machines, "iocModules": ioc_module}
+        response = {"iocQuery": ioc_query, "iocMachines": machines, "iocModules": ioc_modules}
 
         action_result.add_data(response)
 
