@@ -1,5 +1,5 @@
 # --
-# File: netwitnessendpoint/__init__.py
+# File: __init__.py
 #
 # Copyright (c) Phantom Cyber Corporation, 2017
 #
