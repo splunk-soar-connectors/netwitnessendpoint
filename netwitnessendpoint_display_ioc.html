@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!--
-File: netwitnessendpoint/netwitnessendpoint_display_ioc.html
+File: netwitnessendpoint_display_ioc.html
 
 Copyright (c) Phantom Cyber Corporation, 2017
 
@@ -116,6 +116,9 @@ of Phantom Cyber Corporation.
             <th>Name</th>
             <th>Description</th>
             <th>IOC Level</th>
+            {% if result.data.iocType %}
+                <th>IOC Type</th>
+            {% endif %}
             <th>OS Type</th>
             <th>Active</th>
             <th>Alertable</th>
@@ -132,6 +135,9 @@ of Phantom Cyber Corporation.
             </td>
             <td>{{ result.data.iocQuery.Description }}</td>
             <td>{{ result.data.iocQuery.IOCLevel }}</td>
+            {% if result.data.iocType %}
+                <td>{{ result.data.iocType }}</td>
+            {% endif %}
             <td>{{ result.data.iocQuery.Type }}</td>
             <td>{{ result.data.iocQuery.Active }}</td>
             <td>{{ result.data.iocQuery.Alertable }}</td>
@@ -218,7 +224,7 @@ $.extend(true, $.fn.dataTable.defaults, {
       pagination.toggle(this.api().page.info().pages > 1);
     }
   });
-  $.fn.DataTable.ext.pager.numbers_length = 5;
+  $.fn.DataTable.ext.pager.numbers_length = 7;
   $('.datatable').DataTable();
 </script>
 

@@ -1,5 +1,5 @@
 # --
-# File: netwitnessendpoint/netwitnessendpoint_consts.py
+# File: netwitnessendpoint_consts.py
 #
 # Copyright (c) Phantom Cyber Corporation, 2017
 #
@@ -17,18 +17,17 @@ NWENDPOINT_CONFIG_USERNAME = "username"
 NWENDPOINT_CONFIG_PASSWORD = "password"
 NWENDPOINT_CONFIG_VERIFY_SSL = "verify_server_cert"
 NWENDPOINT_CONFIG_MAX_IOC_LEVEL = "max_ioc_level"
+NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
 NWENDPOINT_DEFAULT_IOC_LEVEL = 2
-NWENDPOINT_LIST_SCAN_CATEGORY_ENDPOINT = "/api/v2/scancategory"
+NWENDPOINT_DEFAULT_IOC_COUNT = 5
 NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT = "/api/v2/health?format=json"
 NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
 NWENDPOINT_BLOCK_IP_ENDPOINT = "/api/v2/blacklist/ip?format=json"
 NWENDPOINT_GET_SCAN_DATA_ENDPOINT = "/api/v2/machines/{}/scandata/{}?format=json"
+NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT = "/api/v2/machines/{guid}/instantiocs?format=json"
 NWENDPOINT_SCAN_ENDPOINT = "/api/v2/machines/{}/scan?format=json"
 NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT = "/api/v2/machines/{}?format=json"
-NWENDPOINT_GET_IOC_ENDPOINT = "/api/v2/instantiocs/{}?format=json"
-NWENDPOINT_GET_IOC_MACHINES_ENDPOINT = "/api/v2/instantiocs/{}/machines?format=json"
 NWENDPOINT_INSTANTIOC_ENDPOINT = "/api/v2/instantiocs?format=json"
-NWENDPOINT_INSTANTIOC_MACHINE_ENDPOINT = "/api/v2/instantiocs/{}/machines?format=json"
 NWENDPOINT_MACHINES_MODULES_ENDPOINT = "/api/v2/machines/{}/modules?format=json"
 NWENDPOINT_MACHINES_MODULES_INSTANTIOCS_ENDPOINT = "/api/v2/machines/{}/modules/{}/instantiocs?format=json"
 NWENDPOINT_LIST_MACHINES_ENDPOINT = "/api/v2/machines?format=json"
@@ -60,7 +59,6 @@ NWENDPOINT_JSON_NAME = "name"
 NWENDPOINT_JSON_IP_ADDRESS = "ip"
 NWENDPOINT_JSON_IOC_SCORE_GTE = "iocscore_gte"
 NWENDPOINT_JSON_IOC_SCORE_LTE = "iocscore_lte"
-NWENDPOINT_JSON_IOC_QUERY = "ioc_query"
 NWENDPOINT_JSON_SCAN_CATEGORY = "scan_category"
 NWENDPOINT_JSON_CAPTURE_FLOATING_CODE = "capture_floating_code"
 NWENDPOINT_JSON_ALL_NETWORK_CONNECTIONS = "all_network_connections"
@@ -74,9 +72,11 @@ NWENDPOINT_JSON_NOTIFY = "notify"
 NWENDPOINT_JSON_INVALID_LIMIT = "Maximum number of records to be fetched must be a positive integer"
 NWENDPOINT_JSON_INVALID_MACHINE_COUNT = "Please provide a valid positive integer for MachineCount"
 NWENDPOINT_JSON_INVALID_MODULE_COUNT = "Please provide a valid positive integer for ModuleCount"
-NWENDPOINT_JSON_INVALID_IOC_LEVEL = "Please provide a valid positive integer for IOCLevel"
 NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR = "Please provide a valid positive integer for filtering IOC Score"
+NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE = "IOC score must be a positive integer less than or equal to 1024"
+NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR = "{upper_bound_var} must be greater than or equal to {lower_bound_var}"
 NWENDPOINT_JSON_CPU_MAX_ERROR = "Please provide a valid positive integer for CPU Max"
+NWENDPOINT_PERCENTAGE_ERROR = "Value of {perc_var} must not be greater than 100"
 NWENDPOINT_JSON_CPU_MAX_VM_ERROR = "Please provide a valid positive integer for CPU Max VM"
 NWENDPOINT_JSON_CPU_MIN_ERROR = "Please provide a valid positive integer for CPU Min"
 NWENDPOINT_SCAN_ENDPOINT_MESSAGE = "Start Scanning successful"
@@ -88,4 +88,12 @@ NWENDPOINT_BLACKLIST_DOMAIN_SUCCESS = "Domain blacklisted successfully"
 NWENDPOINT_BLACKLIST_IP_SUCCESS = "IP blacklisted successfully"
 NWENDPOINT_JSON_MACHINE_COUNT = "machine_count"
 NWENDPOINT_JSON_MODULE_COUNT = "module_count"
-NWENDPOINT_JSON_IOC_LEVEL = "ioc_level"
+NWENDPOINT_DEFAULT_FILTER_HOOKS = "Signed Modules"
+NWENDPOINT_DEFAULT_SCAN_CATEGORY = "All"
+NWENDPOINT_DEFAULT_MIN_CPU_VALUE = 20
+NWENDPOINT_DEFAULT_MAX_CPU_VALUE = 95
+NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE = 25
+NWENDPOINT_DEFAULT_IOC_SCORE_GTE = 0
+NWENDPOINT_DEFAULT_IOC_SCORE_LTE = 1024
+NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT = 0
+NWENDPOINT_DEFAULT_MIN_MODULE_COUNT = 0

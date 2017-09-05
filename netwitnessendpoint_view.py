@@ -1,5 +1,5 @@
 # --
-# File: netwitnessendpoint/netwitnessendpoint_view.py
+# File: netwitnessendpoint_view.py
 #
 # Copyright (c) Phantom Cyber Corporation, 2017
 #

@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!--
-File: netwitnessendpoint/netwitnessendpoint_display_list_of_ioc.html
+File: netwitnessendpoint_display_list_of_ioc.html
 
 Copyright (c) Phantom Cyber Corporation, 2017
 
@@ -82,7 +82,7 @@ of Phantom Cyber Corporation.
     {% if not result.data %}
     <h4 class="wf-h4-style">No data found</h4>
     {% else %}
-        <h3 class="wf-h3-style">Windows</h3>
+        <h3 class="wf-h3-style">IOC details</h3>
         <div class="ioc_table">
             <table class="wf-table-horizontal datatable">
                 <thead>
@@ -133,113 +133,7 @@ of Phantom Cyber Corporation.
             </table>
             <br>
         </div>
-
-        <h3 class="wf-h3-style">Mac</h3>
-
-        <div class="ioc_table">
-            <table class="wf-table-horizontal datatable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Level</th>
-                        <th>Active</th>
-                        <th>Alertable</th>
-                        <th>Machine Count</th>
-                        <th>Module Count</th>
-                        <th>Last Executed</th>
-                        <th>Blacklisted Count</th>
-                        <th>Whitelisted Count</th>
-                        <th>Graylisted Count</th>
-                        <th>User Defined</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in result.data %}
-                        {% if item.Type == 'Mac' %}
-                        <tr>
-                            <td>
-                                <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ item.Name }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            <td>{{ item.Description }}</td>
-                            <td>{{ item.IOCLevel }}</td>
-                            <td>{{ item.Active }}</td>
-                            <td>{{ item.Alertable }}</td>
-                            <td>{{ item.MachineCount }}</td>
-                            <td>{{ item.ModuleCount }}</td>
-                            <td>{{ item.LastExecuted }}</td>
-                            <td>{{ item.BlacklistedCount }}</td>
-                            <td>{{ item.WhitelistedCount }}</td>
-                            <td>{{ item.GraylistedCount }}</td>
-                            <td>{{ item.UserDefined }}</td>
-                            <td>{{ item.ErrorMessage }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <h3 class="wf-h3-style">Linux</h3>
-
-        <div class="ioc_table">
-            <table class="wf-table-horizontal datatable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Level</th>
-                        <th>Active</th>
-                        <th>Alertable</th>
-                        <th>Machine Count</th>
-                        <th>Module Count</th>
-                        <th>Last Executed</th>
-                        <th>Blacklisted Count</th>
-                        <th>Whitelisted Count</th>
-                        <th>Graylisted Count</th>
-                        <th>User Defined</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in result.data %}
-                        {% if item.Type == 'Linux' %}
-                        <tr>
-                            <td>
-                                <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ item.Name }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            <td>{{ item.Description }}</td>
-                            <td>{{ item.IOCLevel }}</td>
-                            <td>{{ item.Active }}</td>
-                            <td>{{ item.Alertable }}</td>
-                            <td>{{ item.MachineCount }}</td>
-                            <td>{{ item.ModuleCount }}</td>
-                            <td>{{ item.LastExecuted }}</td>
-                            <td>{{ item.BlacklistedCount }}</td>
-                            <td>{{ item.WhitelistedCount }}</td>
-                            <td>{{ item.GraylistedCount }}</td>
-                            <td>{{ item.UserDefined }}</td>
-                            <td>{{ item.ErrorMessage }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-        </div>
-        {% endif %}
+    {% endif %}
     {% endfor %}
 </div>
 
@@ -259,8 +153,10 @@ $.extend(true, $.fn.dataTable.defaults, {
       pagination.toggle(this.api().page.info().pages > 1);
     }
   });
-  $.fn.DataTable.ext.pager.numbers_length = 5;
-  $('.datatable').DataTable();
+  $.fn.DataTable.ext.pager.numbers_length = 7;
+  $('.datatable').DataTable({
+     "order":[[2,"asc"]]
+    });
 </script>
 
 {% endblock %}
