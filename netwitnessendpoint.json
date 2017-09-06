@@ -1,14 +1,14 @@
 {
   "appid": "133c3933-8b13-416e-a702-8dede7ef1239",
   "name": "NetWitness Endpoint",
-  "description": "This app supports executing various endpoint-based investigative and containment actions on <b>RSA NetWitness Endpoint</b>.<p>To enable users to efficiently prioritize suspicious endpoints and investigate, <b>RSA Netwitness Endpoint</b> provides a scoring mechanism based on the behavior that was seen. Each endpoint will have an aggregated suspect score, which is calculated based on the suspect scores of all modules found on that endpoint. The suspect scores are calculated based on the IOCs that are triggered on the endpoint.<br>There are different levels of IOCs based on how suspicious the behavior is considered. IOCs have four possible levels, ranging from 0 to 3. Below are the details of each IOC level:<br><table><tbody><tr class='plain'><th>IOC Level</th><th>Severity</th><th>Description</th><th>IOC Score Range</th></tr><tr><td>0<td>Critical</td><td>Confirmed infection</td><td>1024-1024</td></tr><tr><td>1<td>High</td><td>Highly suspicious activity</td><td>128-1023</td></tr><tr><td>2<td>Medium</td><td>Activity might be suspicious</td><td>8-127</td></tr><tr><td>3<td>Low</td><td>More informational, but could be suspicious</td><td>1-7</td></tr></tbody></table></p>",
+  "description": "This app supports executing various endpoint-based investigative and containment actions on <b>RSA NetWitness Endpoint</b>.<p>To enable users to efficiently prioritize suspicious endpoints and investigate, <b>RSA Netwitness Endpoint</b> provides a scoring mechanism based on the behavior that was seen. Each endpoint will have an aggregated suspect score, which is calculated based on the suspect scores of all modules found on that endpoint. The suspect scores are calculated based on the IOCs that are triggered on the endpoint.<br>There are different levels of IOCs based on how suspicious the behavior is considered. IOCs have four\u00a0possible levels, ranging from 0 to 3. Below are the details of each IOC level:<br><table><tbody><tr class='plain'><th>IOC Level</th><th>Severity</th><th>Description</th><th>IOC Score Range</th></tr><tr><td>0<td>Critical</td><td>Confirmed infection</td><td>1024-1024</td></tr><tr><td>1<td>High</td><td>Highly suspicious activity</td><td>128-1023</td></tr><tr><td>2<td>Medium</td><td>Activity might be suspicious</td><td>8-127</td></tr><tr><td>3<td>Low</td><td>More informational, but could be suspicious</td><td>1-7</td></tr></tbody></table></p>",
   "publisher": "Phantom",
   "package_name": "phantom_netwitnessendpoint",
   "license": "Copyright (c) Phantom Cyber Corporation 2017",
   "main_module": "netwitnessendpoint_connector.pyc",
   "type": "endpoint",
-    "app_version": "1.0.9",
-    "utctime_updated": "2017-05-09T18:15:03.000000Z",
+  "app_version": "1.0.10",
+  "utctime_updated": "2017-09-06T02:25:33.000000Z",
   "product_vendor": "RSA",
   "product_name": "NetWitness Endpoint",
   "product_version_regex": ".*",
@@ -44,7 +44,12 @@
       "default": "2",
       "description": "Maximum IOC level of machines and modules to ingest (Default: 2)",
       "data_type": "string",
-      "value_list": ["0", "1", "2", "3"],
+      "value_list": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
       "order": 4
     },
     "max_ioc_for_scheduled_poll": {
@@ -79,7 +84,8 @@
           "order": 0,
           "data_type": "string",
           "contains": [
-            "domain", "url"
+            "domain",
+            "url"
           ],
           "primary": true
         }
@@ -125,7 +131,8 @@
             "www.hostnodes.com"
           ],
           "contains": [
-            "domain", "url"
+            "domain",
+            "url"
           ],
           "column_name": "Domain",
           "column_order": 0
@@ -325,21 +332,21 @@
         {
           "data_path": "action_result.parameter.limit",
           "data_type": "numeric",
-          "example_values":[
+          "example_values": [
             50
           ]
         },
         {
           "data_path": "action_result.parameter.iocscore_gte",
           "data_type": "numeric",
-          "example_values":[
+          "example_values": [
             10
           ]
         },
         {
           "data_path": "action_result.parameter.iocscore_lte",
           "data_type": "numeric",
-          "example_values":[
+          "example_values": [
             20
           ]
         },
@@ -1290,7 +1297,7 @@
           "contains": [
             "nwe machine guid"
           ],
-          "example_values":[
+          "example_values": [
             "b76fe88a-6177-927c-ec3f-64c3573d4331"
           ],
           "column_name": "Machine GUID",
@@ -1324,7 +1331,7 @@
             1
           ]
         }
-    ],
+      ],
       "versions": "EQ(*)"
     },
     {
@@ -17647,7 +17654,7 @@
             "False"
           ]
         },
-                {
+        {
           "data_path": "action_result.data.*.Tracking.*.PID",
           "data_type": "string",
           "example_values": [
@@ -18023,7 +18030,12 @@
           "description": "Maximum IOC level of modules (Default: 2)",
           "default": "2",
           "data_type": "string",
-          "value_list": ["0", "1", "2", "3"],
+          "value_list": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
           "order": 1
         },
         "limit": {
@@ -18273,7 +18285,12 @@
           "description": "Maximum IOC level of modules to ingest (Default: 2)",
           "default": "2",
           "data_type": "string",
-          "value_list": ["0", "1", "2", "3"],
+          "value_list": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
           "order": 1
         }
       },
@@ -20001,7 +20018,6 @@
           "example_values": [
             "RSA-NWE-TEST01"
           ]
-
         },
         {
           "data_path": "action_result.data.*.iocMachines.*.UACDisabled",
@@ -20030,7 +20046,6 @@
           "example_values": [
             "False"
           ]
-
         },
         {
           "data_path": "action_result.data.*.iocMachines.*.MachineStatus",
@@ -20160,7 +20175,6 @@
           "example_values": [
             "False"
           ]
-
         },
         {
           "data_path": "action_result.data.*.iocMachines.*.OrganizationUnit",
