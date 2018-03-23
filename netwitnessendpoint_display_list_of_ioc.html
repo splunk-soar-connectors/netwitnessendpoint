@@ -1,10 +1,6 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
-{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
-{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
-{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
-{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -16,7 +12,7 @@
 <!--
 File: netwitnessendpoint_display_list_of_ioc.html
 
-Copyright (c) Phantom Cyber Corporation, 2017
+Copyright (c) Phantom Cyber Corporation, 2018
 
 This unpublished material is proprietary to Phantom Cyber.
 All rights reserved. The methods and
@@ -28,44 +24,35 @@ of Phantom Cyber Corporation.
 
 <style>
 
-    .nweendpoint-list-of-ioc a:link {
-    color: black;
-    }
-
     .nweendpoint-list-of-ioc a:hover {
-    text-decoration:underline;
-    }
-
-    .nweendpoint-list-of-ioc a:visited {
-    color: black;
+        text-decoration:underline;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal {
-    border: 1px solid rgb(234, 234, 234);
-    font-size: 12px;
+        border: 1px solid;
+        font-size: 12px;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal th {
-    text-align: center;
-    border: 1px solid rgb(234, 234, 234);
-    text-transform: uppercase;
-    font-weight: normal;
-    color: rgb(108, 129, 139);
-    padding: 5px;
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal td {
-    border: 1px solid rgb(234, 234, 234);
-    padding: 5px;
-    padding-left: 4px;
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
     }
 
     .nweendpoint-list-of-ioc .wf-h3-style {
-    font-size : 20px
+        font-size : 20px
     }
 
     .nweendpoint-list-of-ioc .wf-h4-style {
-    font-size : 16px
+        font-size : 16px
     }
 
     .nweendpoint-list-of-ioc .ioc_table {
