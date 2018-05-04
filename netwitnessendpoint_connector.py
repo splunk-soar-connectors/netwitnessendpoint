@@ -143,7 +143,7 @@ class NetwitnessendpointConnector(BaseConnector):
         kwargs = {'data': data,
                   'params': params,
                   'auth': (self._username, self._password),
-                  'verify': False}
+                  'verify': self._verify_server_cert}
 
         if timeout is not None:
             kwargs['timeout'] = timeout
