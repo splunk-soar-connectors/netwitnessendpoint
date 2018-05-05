@@ -140,22 +140,22 @@ class NetwitnessendpointConnector(BaseConnector):
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_EXCEPTION_OCCURRED, e), response_data
 
+        kwargs = {'data': data,
+                  'params': params,
+                  'auth': (self._username, self._password),
+                  'verify': self._verify_server_cert}
+
+        if timeout is not None:
+            kwargs['timeout'] = timeout
+
         # If API will result an unauthorized error, then API will be executed for maximum thrice
         for api_execution_trial in range(0, 3):
+
             # Make the call
             try:
-                if timeout is not None:
-                    response = request_func("{}{}".format("https://10.16.0.14:9443", endpoint), data=data,
-                                            params=params,
-                                            auth=("phantom", "Admin@123"), verify=False,
-                                            timeout=timeout)
-                else:
-                    response = request_func("{}{}".format("https://10.16.0.14:9443", endpoint), data=data,
-                                            params=params,
-                                            auth=("phantom", "Admin@123"), verify=False)
+                response = request_func("{}{}".format(self._url, endpoint), **kwargs)
 
             except Exception as e:
-                print consts.NWENDPOINT_ERR_SERVER_CONNECTION, e
                 # set the action_result status to error, the handler function will most probably return as is
                 return action_result.set_status(
                     phantom.APP_ERROR, consts.NWENDPOINT_ERR_SERVER_CONNECTION), response_data
