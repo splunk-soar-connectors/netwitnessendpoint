@@ -158,7 +158,7 @@ class NetwitnessendpointConnector(BaseConnector):
             except Exception as e:
                 # set the action_result status to error, the handler function will most probably return as is
                 return action_result.set_status(
-                    phantom.APP_ERROR, consts.NWENDPOINT_ERR_SERVER_CONNECTION), response_data
+                    phantom.APP_ERROR, consts.NWENDPOINT_ERR_SERVER_CONNECTION.format(e)), response_data
 
             if response.status_code != 401:
                 break
@@ -1249,7 +1249,7 @@ class NetwitnessendpointConnector(BaseConnector):
         :return: status success/failure
         """
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult())
 
         self.save_progress(consts.NWENDPOINT_CONNECTION_TEST_MSG)
         self.save_progress("Configured URL: {}".format(self._url))
@@ -1260,8 +1260,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # something went wrong
         if phantom.is_fail(ret_value):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, consts.NWENDPOINT_TEST_CONNECTIVITY_FAIL)
+            self.save_progress(consts.NWENDPOINT_TEST_CONNECTIVITY_FAIL)
             return action_result.get_status()
 
         self.set_status_save_progress(phantom.APP_SUCCESS, consts.NWENDPOINT_TEST_CONNECTIVITY_PASS)
