@@ -1,0 +1,53 @@
+<!--
+File: readme.html
+
+Copyright (c) Phantom Cyber Corporation, 2018
+
+This unpublished material is proprietary to Phantom Cyber.
+All rights reserved. The methods and
+techniques described herein are considered trade secrets
+and/or confidential. Reproduction or distribution, in whole
+or in part, is forbidden except by express written permission
+of Phantom Cyber.
+-->
+
+<p>
+To enable users to efficiently prioritize suspicious endpoints and investigate, <b>RSA Netwitness Endpoint</b> provides a scoring mechanism based on the behavior that was seen. Each endpoint will have an aggregated suspect score, which is calculated based on the suspect scores of all modules found on that endpoint. The suspect scores are calculated based on the IOCs that are triggered on the endpoint.
+<br><br>
+There are different levels of IOCs based on how suspicious the behavior is considered. IOCs have four possible levels, ranging from 0 to 3. Below are the details of each IOC level:
+<br><br>
+<table>
+    <tbody>
+        <tr class='plain'>
+            <th>IOC Level</th>
+            <th>Severity</th>
+            <th>Description</th>
+            <th>IOC Score Range</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>Critical</td>
+            <td>Confirmed infection</td>
+            <td>1024-1024</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>High</td>
+            <td>Highly suspicious activity</td>
+            <td>128-1023</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Medium</td>
+            <td>Activity might be suspicious</td>
+            <td>8-127</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Low</td>
+            <td>More informational, but could be suspicious</td>
+            <td>1-7</td>
+        </tr>
+    </tbody>
+</table>
+</p>

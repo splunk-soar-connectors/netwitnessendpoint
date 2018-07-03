@@ -1,10 +1,6 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
-{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
-{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
-{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
-{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -14,9 +10,9 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!--
-File: netwitnessendpoint/netwitnessendpoint_display_scan_data.html
+File: netwitnessendpoint_display_scan_data.html
 
-Copyright (c) Phantom Cyber Corporation, 2017
+Copyright (c) Phantom Cyber Corporation, 2018
 
 This unpublished material is proprietary to Phantom Cyber.
 All rights reserved. The methods and
@@ -28,41 +24,32 @@ of Phantom Cyber Corporation.
 
 <style>
 
-    .nweendpoint-scan-data a:link {
-    color: black;
-    }
-
     .nweendpoint-scan-data a:hover {
-    text-decoration:underline;
-    }
-
-    .nweendpoint-scan-data a:visited {
-    color: black;
+        text-decoration:underline;
     }
 
     .nweendpoint-scan-data .wf-table-horizontal {
-    border: 1px solid rgb(234, 234, 234);
-    font-size: 12px;
+        border: 1px solid;
+        font-size: 12px;
     }
 
     .nweendpoint-scan-data .wf-table-horizontal th {
-    text-align: center;
-    border: 1px solid rgb(234, 234, 234);
-    text-transform: uppercase;
-    font-weight: normal;
-    color: rgb(108, 129, 139);
-    padding: 5px;
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
     }
 
     .nweendpoint-scan-data .wf-table-horizontal td {
-    border: 1px solid rgb(234, 234, 234);
-    padding: 5px;
-    padding-left: 4px;
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
     }
 
     .nweendpoint-scan-data .wf-h4-style {
-    font-size : 14px;
-    font-weight: bold
+        font-size : 14px;
+        font-weight: bold
     }
 
     .nweendpoint-scan-data #Processes, .nweendpoint-scan-data #DLLs, .nweendpoint-scan-data #Drivers,
@@ -74,17 +61,17 @@ of Phantom Cyber Corporation.
     }
 
     .nweendpoint-scan-data .wf-table-vertical {
-    width: initial;
-    font-size: 12px;
+        width: initial;
+        font-size: 12px;
     }
 
     .nweendpoint-scan-data .wf-table-vertical td{
-    padding: 5px;
-    border: 1px solid rgb(234, 234, 234);
+        padding: 5px;
+        border: 1px solid;
     }
 
     .nweendpoint-scan-data .wf-table-vertical tr td:first-child {
-    font-weight: bold;
+        font-weight: bold;
     }
 
     .nweendpoint-scan-data #scan_data_table {

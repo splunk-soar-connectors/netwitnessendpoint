@@ -1,10 +1,6 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
-{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
-{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
-{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
-{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -14,9 +10,9 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!--
-File: netwitnessendpoint/netwitnessendpoint_display_list_of_ioc.html
+File: netwitnessendpoint_display_list_of_ioc.html
 
-Copyright (c) Phantom Cyber Corporation, 2017
+Copyright (c) Phantom Cyber Corporation, 2018
 
 This unpublished material is proprietary to Phantom Cyber.
 All rights reserved. The methods and
@@ -28,44 +24,35 @@ of Phantom Cyber Corporation.
 
 <style>
 
-    .nweendpoint-list-of-ioc a:link {
-    color: black;
-    }
-
     .nweendpoint-list-of-ioc a:hover {
-    text-decoration:underline;
-    }
-
-    .nweendpoint-list-of-ioc a:visited {
-    color: black;
+        text-decoration:underline;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal {
-    border: 1px solid rgb(234, 234, 234);
-    font-size: 12px;
+        border: 1px solid;
+        font-size: 12px;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal th {
-    text-align: center;
-    border: 1px solid rgb(234, 234, 234);
-    text-transform: uppercase;
-    font-weight: normal;
-    color: rgb(108, 129, 139);
-    padding: 5px;
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
     }
 
     .nweendpoint-list-of-ioc .wf-table-horizontal td {
-    border: 1px solid rgb(234, 234, 234);
-    padding: 5px;
-    padding-left: 4px;
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
     }
 
     .nweendpoint-list-of-ioc .wf-h3-style {
-    font-size : 20px
+        font-size : 20px
     }
 
     .nweendpoint-list-of-ioc .wf-h4-style {
-    font-size : 16px
+        font-size : 16px
     }
 
     .nweendpoint-list-of-ioc .ioc_table {
@@ -82,7 +69,7 @@ of Phantom Cyber Corporation.
     {% if not result.data %}
     <h4 class="wf-h4-style">No data found</h4>
     {% else %}
-        <h3 class="wf-h3-style">Windows</h3>
+        <h3 class="wf-h3-style">IOC details</h3>
         <div class="ioc_table">
             <table class="wf-table-horizontal datatable">
                 <thead>
@@ -133,113 +120,7 @@ of Phantom Cyber Corporation.
             </table>
             <br>
         </div>
-
-        <h3 class="wf-h3-style">Mac</h3>
-
-        <div class="ioc_table">
-            <table class="wf-table-horizontal datatable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Level</th>
-                        <th>Active</th>
-                        <th>Alertable</th>
-                        <th>Machine Count</th>
-                        <th>Module Count</th>
-                        <th>Last Executed</th>
-                        <th>Blacklisted Count</th>
-                        <th>Whitelisted Count</th>
-                        <th>Graylisted Count</th>
-                        <th>User Defined</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in result.data %}
-                        {% if item.Type == 'Mac' %}
-                        <tr>
-                            <td>
-                                <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ item.Name }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            <td>{{ item.Description }}</td>
-                            <td>{{ item.IOCLevel }}</td>
-                            <td>{{ item.Active }}</td>
-                            <td>{{ item.Alertable }}</td>
-                            <td>{{ item.MachineCount }}</td>
-                            <td>{{ item.ModuleCount }}</td>
-                            <td>{{ item.LastExecuted }}</td>
-                            <td>{{ item.BlacklistedCount }}</td>
-                            <td>{{ item.WhitelistedCount }}</td>
-                            <td>{{ item.GraylistedCount }}</td>
-                            <td>{{ item.UserDefined }}</td>
-                            <td>{{ item.ErrorMessage }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <h3 class="wf-h3-style">Linux</h3>
-
-        <div class="ioc_table">
-            <table class="wf-table-horizontal datatable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Level</th>
-                        <th>Active</th>
-                        <th>Alertable</th>
-                        <th>Machine Count</th>
-                        <th>Module Count</th>
-                        <th>Last Executed</th>
-                        <th>Blacklisted Count</th>
-                        <th>Whitelisted Count</th>
-                        <th>Graylisted Count</th>
-                        <th>User Defined</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in result.data %}
-                        {% if item.Type == 'Linux' %}
-                        <tr>
-                            <td>
-                                <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ item.Name }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            <td>{{ item.Description }}</td>
-                            <td>{{ item.IOCLevel }}</td>
-                            <td>{{ item.Active }}</td>
-                            <td>{{ item.Alertable }}</td>
-                            <td>{{ item.MachineCount }}</td>
-                            <td>{{ item.ModuleCount }}</td>
-                            <td>{{ item.LastExecuted }}</td>
-                            <td>{{ item.BlacklistedCount }}</td>
-                            <td>{{ item.WhitelistedCount }}</td>
-                            <td>{{ item.GraylistedCount }}</td>
-                            <td>{{ item.UserDefined }}</td>
-                            <td>{{ item.ErrorMessage }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-        </div>
-        {% endif %}
+    {% endif %}
     {% endfor %}
 </div>
 
@@ -259,8 +140,10 @@ $.extend(true, $.fn.dataTable.defaults, {
       pagination.toggle(this.api().page.info().pages > 1);
     }
   });
-  $.fn.DataTable.ext.pager.numbers_length = 5;
-  $('.datatable').DataTable();
+  $.fn.DataTable.ext.pager.numbers_length = 7;
+  $('.datatable').DataTable({
+     "order":[[2,"asc"]]
+    });
 </script>
 
 {% endblock %}

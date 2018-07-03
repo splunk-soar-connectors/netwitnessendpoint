@@ -1,10 +1,6 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
-{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
-{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
-{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
-{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -14,9 +10,9 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!--
-File: netwitnessendpoint/netwitnessendpoint_display_ioc.html
+File: netwitnessendpoint_display_ioc.html
 
-Copyright (c) Phantom Cyber Corporation, 2017
+Copyright (c) Phantom Cyber Corporation, 2018
 
 This unpublished material is proprietary to Phantom Cyber.
 All rights reserved. The methods and
@@ -28,58 +24,49 @@ of Phantom Cyber Corporation.
 
 <style>
 
-    .nweendpoint-ioc a:link {
-    color: black;
-    }
-
     .nweendpoint-ioc a:hover {
-    text-decoration:underline;
-    }
-
-    .nweendpoint-ioc a:visited {
-    color: black;
+        text-decoration:underline;
     }
 
     .nweendpoint-ioc .wf-table-horizontal {
-    border: 1px solid rgb(234, 234, 234);
-    font-size: 12px;
+        border: 1px solid;
+        font-size: 12px;
     }
 
     .nweendpoint-ioc .wf-table-horizontal th {
-    text-align: center;
-    border: 1px solid rgb(234, 234, 234);
-    text-transform: uppercase;
-    font-weight: normal;
-    color: rgb(108, 129, 139);
-    padding: 5px;
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
     }
 
     .nweendpoint-ioc .wf-table-horizontal td {
-    border: 1px solid rgb(234, 234, 234);
-    padding: 5px;
-    padding-left: 4px;
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
     }
 
     .nweendpoint-ioc .wf-h3-style {
-    font-size : 20px
+        font-size : 20px
     }
 
     .nweendpoint-ioc .wf-h4-style {
-    font-size : 16px
+        font-size : 16px
     }
 
     .nweendpoint-ioc .wf-table-vertical {
-    width: initial;
-    font-size: 12px;
+        width: initial;
+        font-size: 12px;
     }
 
     .nweendpoint-ioc .wf-table-vertical td{
-    padding: 5px;
-    border: 1px solid rgb(234, 234, 234);
+        padding: 5px;
+        border: 1px solid;
     }
 
     .nweendpoint-ioc .wf-table-vertical tr td:first-child {
-    font-weight: bold;
+        font-weight: bold;
     }
 
 </style>
@@ -116,6 +103,9 @@ of Phantom Cyber Corporation.
             <th>Name</th>
             <th>Description</th>
             <th>IOC Level</th>
+            {% if result.data.iocType %}
+                <th>IOC Type</th>
+            {% endif %}
             <th>OS Type</th>
             <th>Active</th>
             <th>Alertable</th>
@@ -132,6 +122,9 @@ of Phantom Cyber Corporation.
             </td>
             <td>{{ result.data.iocQuery.Description }}</td>
             <td>{{ result.data.iocQuery.IOCLevel }}</td>
+            {% if result.data.iocType %}
+                <td>{{ result.data.iocType }}</td>
+            {% endif %}
             <td>{{ result.data.iocQuery.Type }}</td>
             <td>{{ result.data.iocQuery.Active }}</td>
             <td>{{ result.data.iocQuery.Alertable }}</td>
@@ -218,7 +211,7 @@ $.extend(true, $.fn.dataTable.defaults, {
       pagination.toggle(this.api().page.info().pages > 1);
     }
   });
-  $.fn.DataTable.ext.pager.numbers_length = 5;
+  $.fn.DataTable.ext.pager.numbers_length = 7;
   $('.datatable').DataTable();
 </script>
 
