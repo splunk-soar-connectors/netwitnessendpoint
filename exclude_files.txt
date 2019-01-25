@@ -1,3 +1,5 @@
+docker-compose.yml
+exclude_files.txt
+Makefile
 *.py
 .git*
-exclude_files.txt
