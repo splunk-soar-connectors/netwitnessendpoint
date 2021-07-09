@@ -1,16 +1,8 @@
-# --
 # File: netwitnessendpoint_connector.py
+# Copyright (c) 2018-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber Corporation.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Standard library imports
 import json
@@ -634,7 +626,7 @@ class NetwitnessendpointConnector(BaseConnector):
                                 "Notify": param.get(consts.NWENDPOINT_JSON_NOTIFY)}
 
         # Prepare parameters dictionary from optional_params_dict by eliminating keys having None value
-        optional_params_dict = dict((key, value) for key, value in optional_params_dict.iteritems() if value)
+        optional_params_dict = dict((key, value) for key, value in optional_params_dict.items() if value)
 
         # Update request parameters
         payload.update(optional_params_dict)
@@ -717,7 +709,6 @@ class NetwitnessendpointConnector(BaseConnector):
         try:
             input_dict_str = json.dumps(input_dict, sort_keys=True)
         except Exception as e:
-            print str(e)
             self.debug_print('Handled exception in _create_dict_hash', e)
             return None
 
@@ -909,7 +900,7 @@ class NetwitnessendpointConnector(BaseConnector):
             for machine in ioc["iocMachines"]:
                 cef = {}
                 cef_types = {}
-                for field, artifact_details in machine_artifacts_mappings.iteritems():
+                for field, artifact_details in machine_artifacts_mappings.items():
                     # if field value is present
                     if machine.get(field):
                         cef_value = machine[field]
@@ -951,7 +942,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 cef = {}
                 cef_types = {}
 
-                for field, artifact_details in module_artifacts_mappings.iteritems():
+                for field, artifact_details in module_artifacts_mappings.items():
                     # if field value is present
                     if machine_module.get(field):
                         cef_value = machine_module[field]
@@ -1305,14 +1296,14 @@ if __name__ == '__main__':
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = NetwitnessendpointConnector()
         connector.print_progress_message = True
         return_value = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(return_value), indent=4)
+        print(json.dumps(json.loads(return_value), indent=4))
     exit(0)
