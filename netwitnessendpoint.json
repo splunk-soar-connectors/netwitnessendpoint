@@ -77,15 +77,15 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "blacklist domain",
-            "description": "Blacklist domain",
+            "action": "blocklist domain",
+            "description": "Blocklist domain",
             "type": "contain",
-            "identifier": "blacklist_domain",
+            "identifier": "blocklist_domain",
             "read_only": false,
             "parameters": {
                 "domain": {
                     "required": true,
-                    "description": "Domain to blacklist",
+                    "description": "Domain to blocklist",
                     "order": 0,
                     "data_type": "string",
                     "contains": [
@@ -133,7 +133,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Domain blacklisted successfully"
+                        "Domain blocklisted successfully"
                     ]
                 },
                 {
@@ -159,20 +159,20 @@
                 "width": 12,
                 "height": 5,
                 "type": "table",
-                "title": "Blacklist Domain"
+                "title": "Blocklist Domain"
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "blacklist ip",
-            "description": "Blacklist IP",
+            "action": "blocklist ip",
+            "description": "Blocklist IP",
             "type": "contain",
-            "identifier": "blacklist_ip",
+            "identifier": "blocklist_ip",
             "read_only": false,
             "parameters": {
                 "ip": {
                     "required": true,
-                    "description": "IP to blacklist",
+                    "description": "IP to blocklist",
                     "order": 0,
                     "data_type": "string",
                     "contains": [
@@ -218,7 +218,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "IP blacklisted successfully"
+                        "IP blocklisted successfully"
                     ]
                 },
                 {
@@ -244,7 +244,7 @@
                 "width": 12,
                 "height": 5,
                 "type": "table",
-                "title": "Blacklist IP"
+                "title": "Blocklist IP"
             },
             "versions": "EQ(*)"
         },

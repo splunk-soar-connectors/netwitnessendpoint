@@ -356,8 +356,8 @@ class NetwitnessendpointConnector(BaseConnector):
         })
         return True, ioc_details
 
-    def _blacklist_domain(self, param):
-        """ Function used to blacklist given domain.
+    def _blocklist_domain(self, param):
+        """ Function used to blocklist given domain.
 
         :param param: dictionary of input parameters
         :return: status status/failure
@@ -375,7 +375,7 @@ class NetwitnessendpointConnector(BaseConnector):
         payload = {'Domains': [domain]}
 
         # Make the call
-        return_val, response = self._make_rest_call(consts.NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT, action_result,
+        return_val, response = self._make_rest_call(consts.NWENDPOINT_BLOCKLIST_DOMAIN_ENDPOINT, action_result,
                                                     data=payload)
 
         # Something went wrong
@@ -386,10 +386,10 @@ class NetwitnessendpointConnector(BaseConnector):
         response = {"domain": response[consts.NWENDPOINT_REST_RESPONSE]["Domains"][0]}
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLACKLIST_DOMAIN_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_DOMAIN_SUCCESS)
 
-    def _blacklist_ip(self, param):
-        """ Function used to blacklist given IP.
+    def _blocklist_ip(self, param):
+        """ Function used to blocklist given IP.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -411,7 +411,7 @@ class NetwitnessendpointConnector(BaseConnector):
         response = {"ip": response[consts.NWENDPOINT_REST_RESPONSE]["Ips"][0]}
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLACKLIST_IP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_IP_SUCCESS)
 
     def _list_endpoints(self, param):
         """ Function used to get list of all endpoints configured on RSA NetWitness Endpoint.
@@ -1267,10 +1267,10 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Dictionary mapping each action with its corresponding actions
         supported_actions = {
-            'blacklist_domain': self._blacklist_domain,
+            'blocklist_domain': self._blocklist_domain,
             'get_scan_data': self._get_scan_data,
             'list_endpoints': self._list_endpoints,
-            'blacklist_ip': self._blacklist_ip,
+            'blocklist_ip': self._blocklist_ip,
             'scan_endpoint': self._scan_endpoint,
             'get_system_info': self._get_system_info,
             'get_ioc': self._get_ioc,

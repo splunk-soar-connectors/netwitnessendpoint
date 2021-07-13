@@ -13,7 +13,7 @@ NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
 NWENDPOINT_DEFAULT_IOC_LEVEL = 2
 NWENDPOINT_DEFAULT_IOC_COUNT = 5
 NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT = "/api/v2/health?format=json"
-NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
+NWENDPOINT_BLOCKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
 NWENDPOINT_BLOCK_IP_ENDPOINT = "/api/v2/blacklist/ip?format=json"
 NWENDPOINT_GET_SCAN_DATA_ENDPOINT = "/api/v2/machines/{}/scandata/{}?format=json"
 NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT = "/api/v2/machines/{guid}/instantiocs?format=json"
@@ -76,8 +76,8 @@ NWENDPOINT_DEFAULT_POLL_NOW_CONTAINER_COUNT = 5
 NWENDPOINT_CONTAINER_ERROR = "Error while creating container"
 NWENDPOINT_ARTIFACTS_DESC = "Artifact created by NetWitness Endpoint app"
 NWENDPOINT_DEFAULT_LIMIT = 50
-NWENDPOINT_BLACKLIST_DOMAIN_SUCCESS = "Domain blacklisted successfully"
-NWENDPOINT_BLACKLIST_IP_SUCCESS = "IP blacklisted successfully"
+NWENDPOINT_BLOCKLIST_DOMAIN_SUCCESS = "Domain blocklisted successfully"
+NWENDPOINT_BLOCKLIST_IP_SUCCESS = "IP blocklisted successfully"
 NWENDPOINT_JSON_MACHINE_COUNT = "machine_count"
 NWENDPOINT_JSON_MODULE_COUNT = "module_count"
 NWENDPOINT_DEFAULT_FILTER_HOOKS = "Signed Modules"
