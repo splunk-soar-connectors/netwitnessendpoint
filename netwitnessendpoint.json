@@ -15,7 +15,7 @@
     "python_version": "3",
     "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "first change"
+        "RSA NetWitness Endpoint, Ver - 4.3.0.1, July 15, 2021"
     ],
     "logo": "logo_rsa.svg",
     "logo_dark": "logo_rsa_dark.svg",
@@ -176,7 +176,8 @@
                     "order": 0,
                     "data_type": "string",
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "primary": true
                 }
@@ -199,7 +200,8 @@
                         "1.2.3.4"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "column_name": "IP",
                     "column_order": 0
@@ -211,7 +213,8 @@
                         "1.2.3.4"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {

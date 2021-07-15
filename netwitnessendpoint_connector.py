@@ -9,6 +9,7 @@ import json
 import hashlib
 import requests
 from dateutil.parser import parse
+import ipaddress
 
 # Phantom imports
 import phantom.app as phantom
@@ -98,11 +99,28 @@ class NetwitnessendpointConnector(BaseConnector):
                                              consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
         self._max_scheduled_ioc_count = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL,
                                                        consts.NWENDPOINT_DEFAULT_IOC_COUNT))
+        self.set_validator("ipv6", self._is_ip)
 
         # load the state of app stored in JSON file
         self._app_state = self.load_state()
 
         return phantom.APP_SUCCESS
+
+    def _is_ip(self, input_ip_address):
+        """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        ip_address_input = input_ip_address
+
+        try:
+            ipaddress.ip_address(str(ip_address_input))
+        except:
+            return False
+
+        return True
 
     def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
         """ Function that makes the REST call to the device. It is a generic function that can be called from various
