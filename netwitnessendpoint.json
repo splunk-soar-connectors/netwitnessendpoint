@@ -2,7 +2,7 @@
     "appid": "133c3933-8b13-416e-a702-8dede7ef1239",
     "name": "NetWitness Endpoint",
     "description": "This app supports executing various endpoint-based investigative and containment actions on RSA NetWitness Endpoint",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "package_name": "phantom_netwitnessendpoint",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "main_module": "netwitnessendpoint_connector.py",
@@ -15,7 +15,7 @@
     "python_version": "3",
     "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "RSA NetWitness Endpoint, Ver - 4.3.0.1, July 15, 2021"
+        "RSA NetWitness Endpoint, Ver - 4.3.0.1"
     ],
     "logo": "logo_rsa.svg",
     "logo_dark": "logo_rsa_dark.svg",
@@ -47,7 +47,7 @@
         "max_ioc_level": {
             "required": true,
             "default": "2",
-            "description": "Maximum IOC level of machines and modules to ingest (Default: 2)",
+            "description": "Maximum IOC level of modules to retrieve (Default: 2)",
             "data_type": "string",
             "value_list": [
                 "0",
@@ -60,7 +60,7 @@
         "max_ioc_for_scheduled_poll": {
             "required": true,
             "default": 5,
-            "description": "Maximum IOC for scheduled poll (Default: 5)",
+            "description": "Maximum Container (IOC) to ingest for the scheduled poll (Default: 5)",
             "data_type": "numeric",
             "order": 5
         }
@@ -78,7 +78,7 @@
         },
         {
             "action": "blocklist domain",
-            "description": "Blocklist domain",
+            "description": "Blocklist the domain",
             "type": "contain",
             "identifier": "blocklist_domain",
             "read_only": false,
@@ -110,7 +110,7 @@
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "example_values": [
-                        "www.hostnodes.com"
+                        "www.test.com"
                     ],
                     "contains": [
                         "domain",
@@ -123,7 +123,7 @@
                     "data_path": "action_result.data.*.domain",
                     "data_type": "string",
                     "example_values": [
-                        "www.hostnodes.com"
+                        "www.test.com"
                     ],
                     "contains": [
                         "domain"
@@ -165,7 +165,7 @@
         },
         {
             "action": "blocklist ip",
-            "description": "Blocklist IP",
+            "description": "Blocklist the IP",
             "type": "contain",
             "identifier": "blocklist_ip",
             "read_only": false,
@@ -197,7 +197,7 @@
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "example_values": [
-                        "1.2.3.4"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip",
@@ -210,7 +210,7 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "example_values": [
-                        "1.2.3.4"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip",
@@ -254,7 +254,7 @@
         {
             "action": "list endpoints",
             "description": "Lists all the windows endpoints configured on NetWitness Endpoint",
-            "verbose": "If <b>limit</b> parameter is 0 or not specified, the action will fetch all the windows endpoints.",
+            "verbose": "If the <b>limit</b> parameter is 0 or not specified, the action will fetch all the windows endpoints.",
             "type": "investigate",
             "identifier": "list_endpoints",
             "read_only": true,
@@ -1594,7 +1594,7 @@
         {
             "action": "get scan data",
             "description": "Get scan data of an endpoint",
-            "verbose": "This action will return latest scan results. If the latest scan was done with a specific category, the resulting scan results may not contain data for all categories. If the <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category, if limit specified is greater than the available data, the action will fetch all data for that category.",
+            "verbose": "This action will return the latest scan results. If the latest scan was done with a specific category, the resulting scan results may not contain data for all categories. If the <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category, if the limit specified is greater than the available data, the action will fetch all data for that category.",
             "type": "investigate",
             "identifier": "get_scan_data",
             "read_only": true,
@@ -16491,7 +16491,7 @@
         {
             "action": "on poll",
             "description": "Action to ingest endpoint related information",
-            "verbose": "This action ingests all the IOCs having OS type \"Windows\", IOC level <b>max_ioc_level</b> and lower and whose machine count and module count are greater than 0. The IOCs fetched are ordered with respect to time. Containers are uniquely identified by IOC Description and its OS type. The information of affected machines and modules of an IOC are ingested as artifacts. During manual polling, the number of IOCs to be ingested can be controlled by <b>container_count</b>, and during scheduled polling, the number of IOCs to be ingested in each cycle can be controlled by <b>max_ioc_for_scheduled_poll</b>.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName, iiocScore, riskScore</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress, iiocScore, machineName</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, iocLevel, iocType, lastExecutedTime, osType</td></tr></tbody></table>",
+            "verbose": "This action ingests all the IOCs having OS type \"Windows\", IOC level <b>max_ioc_level</b> and lower and whose machine count and module count are greater than 0. The IOCs fetched are ordered concerning time. Containers are uniquely identified by IOC Description and its OS type. The information of affected machines and modules of an IOC is ingested as artifacts. During manual polling, the number of IOCs to be ingested can be controlled by <b>container_count</b>, and during scheduled polling, the number of IOCs to be ingested in each cycle can be controlled by <b>max_ioc_for_scheduled_poll</b>.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName, iiocScore, riskScore</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress, iiocScore, machineName</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, iocLevel, iocType, lastExecutedTime, osType</td></tr></tbody></table>",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
@@ -16534,8 +16534,8 @@
         },
         {
             "action": "list ioc",
-            "description": "List IOC",
-            "verbose": "This action lists all IOCs having OS type \"Windows\".<br>The results are always sorted in ascending order based on their IOC level to place the most critical IOCs at the top. For example, to get the top 10 critical IOCs that matched the filter, specify the <b>limit</b> as 10. If <b>limit</b> is zero, then all matching IOCs will be returned.",
+            "description": "List the IOC",
+            "verbose": "This action lists all IOCs having OS type \"Windows\".<br>The results are always sorted in ascending order based on their IOC level to place the most critical IOCs at the top. For example, to get the top 10 critical IOCs that matched the filter, specify the <b>limit</b> as 10. If the <b>limit</b> is zero, then all matching IOCs will be returned.",
             "type": "investigate",
             "identifier": "list_ioc",
             "read_only": true,
@@ -16788,7 +16788,7 @@
         },
         {
             "action": "get ioc",
-            "description": "Get IOC",
+            "description": "Get the IOC",
             "verbose": "This action will fetch details of only windows machines whose modules are having IOC level <b>max_ioc_level</b> and lower and are related to the given IOC name.",
             "type": "investigate",
             "identifier": "get_ioc",

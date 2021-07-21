@@ -730,7 +730,7 @@ class NetwitnessendpointConnector(BaseConnector):
             self.debug_print('Handled exception in _create_dict_hash', e)
             return None
 
-        return hashlib.md5(input_dict_str).hexdigest()
+        return hashlib.md5(input_dict_str.encode()).hexdigest()
 
     def _list_ioc(self, param):
         """ Function used to List available IOCs.
