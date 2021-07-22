@@ -739,7 +739,7 @@ class NetwitnessendpointConnector(BaseConnector):
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
         if limit is None or machine_count is None or module_count is None or ioc_level is None:
-            return action_result.set_status(phantom.APP_ERROR)
+            return action_result.get_status()
 
         # Get list of all IOCs
         ret_value, ioc_list = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT,
