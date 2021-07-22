@@ -122,6 +122,24 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return True
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    action_result.set_status(phantom.APP_ERROR, consts.INVALID_INT.format(param=key))
+                    return None
+
+                parameter = int(parameter)
+            except:
+                action_result.set_status(phantom.APP_ERROR, consts.INVALID_INT.format(param=key))
+                return None
+
+            if parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, consts.ERR_NEGATIVE_INT_PARAM.format(param=key))
+                return None
+
+        return parameter
+
     def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
         """ Function that makes the REST call to the device. It is a generic function that can be called from various
         action handlers.
@@ -239,7 +257,9 @@ class NetwitnessendpointConnector(BaseConnector):
             limit = consts.NWENDPOINT_DEFAULT_LIMIT
             limit_provided = False
         else:
-            limit = int(limit)
+            limit = self._validate_integer(action_result, limit, 'limit')
+            if limit is None:
+                return action_result.get_status()
             # If limit is less than default value of limit, then querying only specified amount of data
             # for the provided machine
             if limit < consts.NWENDPOINT_DEFAULT_LIMIT:
@@ -382,6 +402,7 @@ class NetwitnessendpointConnector(BaseConnector):
         """
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        summary_data = action_result.update_summary({})
 
         domain = param[consts.NWENDPOINT_JSON_DOMAIN]
 
@@ -401,7 +422,9 @@ class NetwitnessendpointConnector(BaseConnector):
             return action_result.get_status()
 
         # Changing response to make it eligible for contextual actions
-        response = {"domain": response[consts.NWENDPOINT_REST_RESPONSE]["Domains"][0]}
+        domain_name = response[consts.NWENDPOINT_REST_RESPONSE]["Domains"][0]
+        response = {"domain": domain_name}
+        summary_data['domain'] = domain_name
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_DOMAIN_SUCCESS)
@@ -414,6 +437,7 @@ class NetwitnessendpointConnector(BaseConnector):
         """
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        summary_data = action_result.update_summary({})
 
         # Get mandatory input parameters
         payload = {"Ips": [param[consts.NWENDPOINT_JSON_IP_ADDRESS]]}
@@ -425,8 +449,9 @@ class NetwitnessendpointConnector(BaseConnector):
         # something went wrong
         if phantom.is_fail(ret_value):
             return action_result.get_status()
-
-        response = {"ip": response[consts.NWENDPOINT_REST_RESPONSE]["Ips"][0]}
+        ip = response[consts.NWENDPOINT_REST_RESPONSE]["Ips"][0]
+        response = {"ip": ip}
+        summary_data['ip'] = ip
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_IP_SUCCESS)
@@ -442,38 +467,26 @@ class NetwitnessendpointConnector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # Get optional parameters
-        ioc_score_gte = param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE)
-        ioc_score_lte = param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE)
-        limit = param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT)
+        ioc_score_gte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE), 'ioc_score_gte')
+        ioc_score_lte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE), 'ioc_score_lte')
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
+
+        if ioc_score_lte is None or ioc_score_gte is None or limit is None:
+            return action_result.set_status(phantom.APP_ERROR)
         machine_list = list()
         # Prepare dictionary of optional parameters
         params = {}
 
-        # Validate that ioc_score_gte is positive integer if provided and update params dict
-        if ioc_score_gte:
-            if str(ioc_score_gte).isdigit():
-                params[consts.NWENDPOINT_JSON_IOC_SCORE_GTE] = int(ioc_score_gte)
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
-
-        # Validate that ioc_score_lte is positive integer if provided and update params dict
-        if ioc_score_lte:
-            if str(ioc_score_lte).isdigit():
-                # If given IOC score is greater than 1024
-                if int(ioc_score_lte) <= consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE:
-                    params[consts.NWENDPOINT_JSON_IOC_SCORE_LTE] = int(ioc_score_lte)
-                else:
-                    self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
-                    return action_result.set_status(
-                        phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE
-                    )
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_ERROR)
+        params[consts.NWENDPOINT_JSON_IOC_SCORE_GTE] = ioc_score_gte
+        if ioc_score_lte <= consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE:
+            params[consts.NWENDPOINT_JSON_IOC_SCORE_LTE] = ioc_score_lte
+        else:
+            self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
+            return action_result.set_status(
+                phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
 
         # If given ioc_score_lte is less than given ioc_score_gte
-        if int(ioc_score_lte) < int(ioc_score_gte):
+        if ioc_score_lte < ioc_score_gte:
             self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
                 upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte"
             ))
@@ -482,19 +495,9 @@ class NetwitnessendpointConnector(BaseConnector):
                     upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte"
                 )
             )
-
-        # Validate that limit is positive integer if provided and update params dict
-        if limit:
-            if str(limit).isdigit():
-                ret_value, response = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
-                                                                   action_result, "Items", params=param,
-                                                                   limit=limit)
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
-        else:
-            ret_value, response = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result,
-                                                               "Items", params=param)
+        ret_value, response = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
+                                                           action_result, "Items", params=param,
+                                                           limit=limit)
 
         # Filtering out machines having operating system other than Windows
         for machine_data in response:
@@ -563,14 +566,17 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        summary_data = action_result.update_summary({})
 
         # Get optional parameters
         filter_hooks = param.get(consts.NWENDPOINT_JSON_FILTER_HOOKS, consts.NWENDPOINT_DEFAULT_FILTER_HOOKS)
-        cpu_max = param.get(consts.NWENDPOINT_JSON_CPUMAX, consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE)
-        cpu_max_vm = param.get(consts.NWENDPOINT_JSON_CPUMAXVM, consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE)
-        cpu_min = param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE)
+        cpu_max = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX, consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), 'cpu_max')
+        cpu_max_vm = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM, consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), 'cpu_max_vm')
+        cpu_min = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), 'cpu_min')
         scan_category = SCAN_CATEGORY_MAPPING.get(param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY,
                                                             param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)))
+        if cpu_max is None or cpu_max_vm is None or cpu_min is None:
+            return action_result.set_status(phantom.APP_ERROR)
 
         # Prepare request parameters
         payload = {"Guid": guid}
@@ -582,49 +588,34 @@ class NetwitnessendpointConnector(BaseConnector):
             payload['FilterTrustedRoot'] = True
 
         # Validate that cpu_max is positive integer and update the request parameters
-        if cpu_max:
-            if str(cpu_max).isdigit():
-                if int(cpu_max) <= 100:
-                    payload["CpuMax"] = int(cpu_max)
-                else:
-                    self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max"))
-                    return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                        perc_var="cpu_max"
-                    ))
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_CPU_MAX_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_CPU_MAX_ERROR)
+        if cpu_max <= 100:
+            payload["CpuMax"] = cpu_max
+        else:
+            self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max"))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
+                perc_var="cpu_max"
+            ))
 
         # Validate that cpu_max is positive integer and update the request parameters
-        if cpu_max_vm:
-            if str(cpu_max_vm).isdigit():
-                if int(cpu_max_vm) <= 100:
-                    payload["CpuMaxVm"] = int(cpu_max_vm)
-                else:
-                    self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max_vm"))
-                    return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                        perc_var="cpu_max_vm"
-                    ))
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_CPU_MAX_VM_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_CPU_MAX_VM_ERROR)
+        if cpu_max_vm <= 100:
+            payload["CpuMaxVm"] = cpu_max_vm
+        else:
+            self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max_vm"))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
+                perc_var="cpu_max_vm"
+            ))
 
         # Validate that cpu_min is positive integer and update the request parameters
-        if cpu_min:
-            if str(cpu_min).isdigit():
-                if int(cpu_min) <= 100:
-                    payload["CpuMin"] = int(cpu_min)
-                else:
-                    self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_min"))
-                    return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                        perc_var="cpu_min"
-                    ))
-            else:
-                self.debug_print(consts.NWENDPOINT_JSON_CPU_MIN_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_CPU_MIN_ERROR)
+        if cpu_min <= 100:
+            payload["CpuMin"] = cpu_min
+        else:
+            self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_min"))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
+                perc_var="cpu_min"
+            ))
 
         # If given ioc_score_gte is less than given ioc_score_lte
-        if int(cpu_max) < int(cpu_min):
+        if cpu_max < cpu_min:
             self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
                 upper_bound_var="cpu_max", lower_bound_var="cpu_min"
             ))
@@ -658,7 +649,7 @@ class NetwitnessendpointConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(res[consts.NWENDPOINT_REST_RESPONSE])
-
+        summary_data['guid'] = guid
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_SCAN_ENDPOINT_MESSAGE)
 
     def _get_scan_data(self, param):
@@ -679,13 +670,11 @@ class NetwitnessendpointConnector(BaseConnector):
         guid = param[consts.NWENDPOINT_JSON_GUID]
 
         # Get optional parameter
-        limit = param.get(consts.NWENDPOINT_JSON_LIMIT)
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
         # Validate that limit is positive integer
-        if limit:
-            if not str(limit).isdigit():
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
+        if limit is None:
+            return action_result.set_status(phantom.APP_ERROR)
 
         data = {}
 
@@ -744,28 +733,13 @@ class NetwitnessendpointConnector(BaseConnector):
         matching_ioc_records = []
 
         # get optional input parameter to filter response
-        machine_count = param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT)
-        module_count = param.get(consts.NWENDPOINT_JSON_MODULE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT)
-        ioc_level = param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL)
-        limit = param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT)
+        machine_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT), 'machine_count')
+        module_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MODULE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), 'module_count')
+        ioc_level = self._validate_integer(action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL), 'ioc_level')
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
-        # Validate that limit is positive integer
-        if limit:
-            if not str(limit).isdigit():
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_LIMIT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_LIMIT)
-
-        # Validate that MachineCount is positive integer
-        if machine_count:
-            if not str(machine_count).isdigit():
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MACHINE_COUNT)
-
-        # Validate that ModuleCount is positive integer
-        if module_count:
-            if not str(module_count).isdigit():
-                self.debug_print(consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
-                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_INVALID_MODULE_COUNT)
+        if limit is None or machine_count is None or module_count is None or ioc_level is None:
+            return action_result.set_status(phantom.APP_ERROR)
 
         # Get list of all IOCs
         ret_value, ioc_list = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT,
@@ -778,12 +752,12 @@ class NetwitnessendpointConnector(BaseConnector):
         ioc_list = sorted(ioc_list, key=lambda k: int(k['IOCLevel']))
 
         for ioc_detail in ioc_list:
-            if (int(ioc_detail['IOCLevel']) <= int(ioc_level)) and \
-                    (int(ioc_detail['MachineCount']) >= int(machine_count)) and \
-                    (int(ioc_detail['ModuleCount']) >= int(module_count)) and ioc_detail["Type"] == "Windows":
+            if (int(ioc_detail['IOCLevel']) <= ioc_level) and \
+                    (int(ioc_detail['MachineCount']) >= machine_count) and \
+                    (int(ioc_detail['ModuleCount']) >= module_count) and ioc_detail["Type"] == "Windows":
                 matching_ioc_records.append(ioc_detail)
 
-            if 0 < int(limit) == len(matching_ioc_records):
+            if 0 < limit == len(matching_ioc_records):
                 break
 
         for ioc in matching_ioc_records:
@@ -846,7 +820,7 @@ class NetwitnessendpointConnector(BaseConnector):
         response = {
             "iocQuery": ioc_query,
             "iocMachines": ioc_details["machines_per_ioc"],
-            "iocModules": ioc_modules,
+            "iocModules": ioc_modules
         }
 
         if ioc_details.get("ioc_type"):
@@ -962,8 +936,9 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 for field, artifact_details in module_artifacts_mappings.items():
                     # if field value is present
-                    if machine_module.get(field):
-                        cef_value = machine_module[field]
+                    machine_field = machine_module.get(field)
+                    if machine_field:
+                        cef_value = machine_field
 
                         cef[artifact_details["cef"]] = cef_value
                         cef_types[artifact_details["cef"]] = artifact_details["cef_types"]

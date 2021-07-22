@@ -137,6 +137,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "www.test.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -227,6 +234,12 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },{
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "122.122.122.122"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1388,7 +1401,7 @@
                     "order": 1
                 },
                 "filter_hooks": {
-                    "description": "Filter hooks ( Default: Signed Modules)",
+                    "description": "Filter hooks (Default: Signed Modules)",
                     "data_type": "string",
                     "value_list": [
                         "Signed Modules",
@@ -1567,6 +1580,13 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "b76fe88a-6177-927c-ec3f-64c3573d4331"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
