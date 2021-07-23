@@ -117,7 +117,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
         try:
             ipaddress.ip_address(str(ip_address_input))
-        except Exception:
+        except Exception as e:
+            self.debug_print(consts.NWENDPOINT_EXCEPTION_OCCURRED, e)
             return False
 
         return True
