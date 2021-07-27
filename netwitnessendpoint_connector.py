@@ -794,8 +794,7 @@ class NetwitnessendpointConnector(BaseConnector):
             return action_result.get_status()
 
         # Get details of only that IOC whose name matches with requested IOC and whose type is Windows
-        ioc_query = next((ioc for ioc in response if ioc["Name"].lower() == name.lower() and
-                          ioc['Type'].lower() == "windows"), None)
+        ioc_query = next((ioc for ioc in response if ioc["Name"].lower() == name.lower() and ioc['Type'].lower() == "windows"), None)
 
         # If IOC is not available on server it will return empty dictionary
         if not ioc_query:
@@ -1179,8 +1178,8 @@ class NetwitnessendpointConnector(BaseConnector):
             self.save_progress("Filtering IOCs")
 
             # Filter IOCs
-            instant_iocs = [ioc for ioc in ioc_queries if int(ioc['IOCLevel']) <= self._max_ioc_level and
-                            (ioc['MachineCount'] != '0' or ioc['ModuleCount'] != '0') and ioc["Type"] == "Windows"]
+            instant_iocs = [ioc for ioc in ioc_queries if int(ioc['IOCLevel']) <= self._max_ioc_level and (
+                    ioc['MachineCount'] != '0' or ioc['ModuleCount'] != '0') and ioc["Type"] == "Windows"]
 
         # If source_id is available
         else:
