@@ -1,16 +1,8 @@
-# --
 # File: netwitnessendpoint_view.py
+# Copyright (c) 2018-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber Corporation.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 
 def _get_ctx_result(result, provides):
@@ -45,7 +37,7 @@ def _get_ctx_result(result, provides):
                       'Tasks': [0, 0], 'ImageHooks': [0, 0], 'WindowsHooks': [0, 0], 'SuspiciousThreads': [0, 0],
                       'KernelHooks': [0, 0], 'RegistryDiscrepancies': [0, 0], 'Network': [0, 0], 'Tracking': [0, 0]}
 
-        for item, value in data[0].iteritems():
+        for item, value in data[0].items():
             # if key is not empty
             if value:
                 count_dict[item][0] = len(value)

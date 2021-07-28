@@ -1,16 +1,8 @@
-# --
 # File: netwitnessendpoint_consts.py
+# Copyright (c) 2018-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber Corporation.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 NWENDPOINT_CONFIG_URL = "url"
 NWENDPOINT_CONFIG_USERNAME = "username"
@@ -21,7 +13,7 @@ NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
 NWENDPOINT_DEFAULT_IOC_LEVEL = 2
 NWENDPOINT_DEFAULT_IOC_COUNT = 5
 NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT = "/api/v2/health?format=json"
-NWENDPOINT_BLACKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
+NWENDPOINT_BLOCKLIST_DOMAIN_ENDPOINT = "/api/v2/blacklist/domain?format=json"
 NWENDPOINT_BLOCK_IP_ENDPOINT = "/api/v2/blacklist/ip?format=json"
 NWENDPOINT_GET_SCAN_DATA_ENDPOINT = "/api/v2/machines/{}/scandata/{}?format=json"
 NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT = "/api/v2/machines/{guid}/instantiocs?format=json"
@@ -84,8 +76,8 @@ NWENDPOINT_DEFAULT_POLL_NOW_CONTAINER_COUNT = 5
 NWENDPOINT_CONTAINER_ERROR = "Error while creating container"
 NWENDPOINT_ARTIFACTS_DESC = "Artifact created by NetWitness Endpoint app"
 NWENDPOINT_DEFAULT_LIMIT = 50
-NWENDPOINT_BLACKLIST_DOMAIN_SUCCESS = "Domain blacklisted successfully"
-NWENDPOINT_BLACKLIST_IP_SUCCESS = "IP blacklisted successfully"
+NWENDPOINT_BLOCKLIST_DOMAIN_SUCCESS = "Domain blocklisted successfully"
+NWENDPOINT_BLOCKLIST_IP_SUCCESS = "IP blocklisted successfully"
 NWENDPOINT_JSON_MACHINE_COUNT = "machine_count"
 NWENDPOINT_JSON_MODULE_COUNT = "module_count"
 NWENDPOINT_DEFAULT_FILTER_HOOKS = "Signed Modules"
@@ -97,3 +89,5 @@ NWENDPOINT_DEFAULT_IOC_SCORE_GTE = 0
 NWENDPOINT_DEFAULT_IOC_SCORE_LTE = 1024
 NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT = 0
 NWENDPOINT_DEFAULT_MIN_MODULE_COUNT = 0
+INVALID_INT = "Please provide a valid integer value in the {param}"
+ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
