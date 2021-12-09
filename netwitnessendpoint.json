@@ -14,7 +14,7 @@
     "product_version_regex": ".*",
     "python_version": "3",
     "min_phantom_version": "4.10.0.40961",
-    "fips_compliant": "true",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "RSA NetWitness Endpoint, Ver - 4.3.0.1"
     ],
