@@ -712,6 +712,19 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_fips_enabled(self):
+        try:
+            from phantom_common.install_info import is_fips_enabled
+        except ImportError:
+            return False
+
+        fips_enabled = is_fips_enabled()
+        if fips_enabled:
+            self.debug_print('FIPS is enabled')
+        else:
+            self.debug_print('FIPS is not enabled')
+        return fips_enabled
+
     def _create_dict_hash(self, input_dict):
         """ Function used to create hash of the given input dictionary.
 
@@ -729,6 +742,10 @@ class NetwitnessendpointConnector(BaseConnector):
         except Exception as e:
             self.debug_print('Handled exception in _create_dict_hash', e)
             return None
+
+        fips_enabled = self._get_fips_enabled()
+        if not fips_enabled:
+            return hashlib.md5(input_dict_str.encode()).hexdigest()
 
         return hashlib.sha256(input_dict_str.encode()).hexdigest()
 
