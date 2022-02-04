@@ -15,16 +15,16 @@
 #
 #
 # Standard library imports
-import json
 import hashlib
-import requests
-from dateutil.parser import parse
 import ipaddress
+import json
 
 # Phantom imports
 import phantom.app as phantom
-from phantom.base_connector import BaseConnector
+import requests
+from dateutil.parser import parse
 from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Local imports
 import netwitnessendpoint_consts as consts
@@ -1312,6 +1312,7 @@ class NetwitnessendpointConnector(BaseConnector):
 if __name__ == '__main__':
 
     import sys
+
     import pudb
 
     pudb.set_trace()
