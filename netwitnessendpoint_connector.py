@@ -15,16 +15,16 @@
 #
 #
 # Standard library imports
-import json
 import hashlib
-import requests
-from dateutil.parser import parse
 import ipaddress
+import json
 
 # Phantom imports
 import phantom.app as phantom
-from phantom.base_connector import BaseConnector
+import requests
+from dateutil.parser import parse
 from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Local imports
 import netwitnessendpoint_consts as consts
@@ -478,8 +478,10 @@ class NetwitnessendpointConnector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # Get optional parameters
-        ioc_score_gte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE), 'ioc_score_gte')
-        ioc_score_lte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE), 'ioc_score_lte')
+        ioc_score_gte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE,
+            consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE), 'ioc_score_gte')
+        ioc_score_lte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE,
+            consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE), 'ioc_score_lte')
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
         if ioc_score_lte is None or ioc_score_gte is None or limit is None:
@@ -581,9 +583,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get optional parameters
         filter_hooks = param.get(consts.NWENDPOINT_JSON_FILTER_HOOKS, consts.NWENDPOINT_DEFAULT_FILTER_HOOKS)
-        cpu_max = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX, consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), 'cpu_max')
-        cpu_max_vm = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM, consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), 'cpu_max_vm')
-        cpu_min = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), 'cpu_min')
+        cpu_max = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX,
+            consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), 'cpu_max')
+        cpu_max_vm = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM,
+            consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), 'cpu_max_vm')
+        cpu_min = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN,
+            consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), 'cpu_min')
         scan_category = SCAN_CATEGORY_MAPPING.get(param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY,
                                                             param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)))
         if cpu_max is None or cpu_max_vm is None or cpu_min is None:
@@ -761,9 +766,12 @@ class NetwitnessendpointConnector(BaseConnector):
         matching_ioc_records = []
 
         # get optional input parameter to filter response
-        machine_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT), 'machine_count')
-        module_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MODULE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), 'module_count')
-        ioc_level = self._validate_integer(action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL), 'ioc_level')
+        machine_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT,
+            consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT), 'machine_count')
+        module_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MODULE_COUNT,
+            consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), 'module_count')
+        ioc_level = self._validate_integer(action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL,
+            consts.NWENDPOINT_DEFAULT_IOC_LEVEL), 'ioc_level')
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
         if limit is None or machine_count is None or module_count is None or ioc_level is None:
@@ -1312,12 +1320,13 @@ class NetwitnessendpointConnector(BaseConnector):
 if __name__ == '__main__':
 
     import sys
+
     import pudb
 
     pudb.set_trace()
     if len(sys.argv) < 2:
         print('No test json specified as input')
-        exit(0)
+        sys.exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
@@ -1326,4 +1335,4 @@ if __name__ == '__main__':
         connector.print_progress_message = True
         return_value = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(return_value), indent=4))
-    exit(0)
+    sys.exit(0)
