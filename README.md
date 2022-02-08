@@ -2,15 +2,15 @@
 # NetWitness Endpoint
 
 Publisher: Splunk  
-Connector Version: 2\.0\.5  
+Connector Version: 2\.0\.8  
 Product Vendor: RSA  
 Product Name: NetWitness Endpoint  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.10\.0\.40961  
+Minimum Product Version: 5\.1\.0  
 
 This app supports executing various endpoint\-based investigative and containment actions on RSA NetWitness Endpoint
 
-[comment]: # " File: readme.md"
+[comment]: # " File: README.md"
 [comment]: # "  Copyright (c) 2018-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
