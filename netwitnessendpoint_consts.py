@@ -12,6 +12,7 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+
 NWENDPOINT_CONFIG_URL = "url"
 NWENDPOINT_CONFIG_USERNAME = "username"
 NWENDPOINT_CONFIG_PASSWORD = "password"

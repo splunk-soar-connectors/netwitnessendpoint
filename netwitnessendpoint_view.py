@@ -12,6 +12,7 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+
 def _get_ctx_result(result, provides):
     """  This function get's called for every result object. The result object represents every ActionResult object that
     you've added in the action handler. Usually this is one per action. This function converts the result object into a
