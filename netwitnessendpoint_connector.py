@@ -1340,4 +1340,3 @@ if __name__ == '__main__':
         return_value = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(return_value), indent=4))
     sys.exit(0)
-
