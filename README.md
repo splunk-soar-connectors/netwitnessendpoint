@@ -24,6 +24,7 @@ This app supports executing various endpoint\-based investigative and containmen
 [comment]: # "either express or implied. See the License for the specific language governing permissions"
 [comment]: # "and limitations under the License."
 [comment]: # ""
+[comment]: # ""
 To enable users to efficiently prioritize suspicious endpoints and investigate, **RSA Netwitness
 Endpoint** provides a scoring mechanism based on the behavior that was seen. Each endpoint will have
 an aggregated suspect score, which is calculated based on the suspect scores of all modules found on
