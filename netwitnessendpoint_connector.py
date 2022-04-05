@@ -583,12 +583,14 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get optional parameters
         filter_hooks = param.get(consts.NWENDPOINT_JSON_FILTER_HOOKS, consts.NWENDPOINT_DEFAULT_FILTER_HOOKS)
+
         cpu_max = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX,
             consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), 'cpu_max')
         cpu_max_vm = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM,
             consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), 'cpu_max_vm')
         cpu_min = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN,
             consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), 'cpu_min')
+
         scan_category = SCAN_CATEGORY_MAPPING.get(param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY,
                                                             param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)))
         if cpu_max is None or cpu_max_vm is None or cpu_min is None:
@@ -772,6 +774,7 @@ class NetwitnessendpointConnector(BaseConnector):
             consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), 'module_count')
         ioc_level = self._validate_integer(action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL,
             consts.NWENDPOINT_DEFAULT_IOC_LEVEL), 'ioc_level')
+
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
 
         if limit is None or machine_count is None or module_count is None or ioc_level is None:
@@ -1327,6 +1330,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('No test json specified as input')
         sys.exit(0)
+
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
