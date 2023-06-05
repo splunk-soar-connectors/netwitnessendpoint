@@ -18,6 +18,7 @@
 import hashlib
 import ipaddress
 import json
+import traceback
 
 # Phantom imports
 import phantom.app as phantom
@@ -116,6 +117,25 @@ class NetwitnessendpointConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _get_error_msg_from_exception(self, e):
+        error_code = consts.ERROR_CODE_UNAVAILABLE
+        error_message = consts.ERROR_MESSAGE_UNAVAILABLE
+
+        self.error_print(traceback.format_exc())
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                    return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                elif len(e.args) == 1:
+                    error_message = e.args[0]
+        except Exception:
+            pass
+
+        return "Error Message: {0}".format(error_message)
+
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
 
@@ -129,6 +149,7 @@ class NetwitnessendpointConnector(BaseConnector):
             ipaddress.ip_address(str(ip_address_input))
         except Exception as e:
             self.debug_print(consts.NWENDPOINT_EXCEPTION_OCCURRED, e)
+            self.save_progress(self._get_error_msg_from_exception(e))
             return False
 
         return True
@@ -176,6 +197,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 phantom.APP_ERROR, consts.NWENDPOINT_ERR_API_UNSUPPORTED_METHOD.format(method=method)), response_data
         except Exception as e:
             self.debug_print(consts.NWENDPOINT_EXCEPTION_OCCURRED, e)
+            self.save_progress(self._get_error_msg_from_exception(e))
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_EXCEPTION_OCCURRED, e), response_data
 
@@ -195,6 +217,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 response = request_func("{}{}".format(self._url, endpoint), **kwargs)
 
             except Exception as e:
+                self.save_progress(self._get_error_msg_from_exception(e))
                 # set the action_result status to error, the handler function will most probably return as is
                 return action_result.set_status(
                     phantom.APP_ERROR, consts.NWENDPOINT_ERR_SERVER_CONNECTION.format(e)), response_data
@@ -213,6 +236,7 @@ class NetwitnessendpointConnector(BaseConnector):
             # r.text is guaranteed to be NON None, it will be empty, but not None
             msg_string = consts.NWENDPOINT_ERR_JSON_PARSE.format(raw_text=response.text)
             self.debug_print(msg_string, e)
+            self.save_progress(self._get_error_msg_from_exception(e))
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, msg_string, e), response_data
 
@@ -748,6 +772,7 @@ class NetwitnessendpointConnector(BaseConnector):
             input_dict_str = json.dumps(input_dict, sort_keys=True)
         except Exception as e:
             self.debug_print('Handled exception in _create_dict_hash', e)
+            self.save_progress(self._get_error_msg_from_exception(e))
             return None
 
         fips_enabled = self._get_fips_enabled()

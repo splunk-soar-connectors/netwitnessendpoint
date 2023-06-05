@@ -15,7 +15,7 @@
 
 NWENDPOINT_CONFIG_URL = "url"
 NWENDPOINT_CONFIG_USERNAME = "username"
-NWENDPOINT_CONFIG_PASSWORD = "password"
+NWENDPOINT_CONFIG_PASSWORD = "password"  # pragma: allowlist secret
 NWENDPOINT_CONFIG_VERIFY_SSL = "verify_server_cert"
 NWENDPOINT_CONFIG_MAX_IOC_LEVEL = "max_ioc_level"
 NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
@@ -100,3 +100,6 @@ NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT = 0
 NWENDPOINT_DEFAULT_MIN_MODULE_COUNT = 0
 INVALID_INT = "Please provide a valid integer value in the {param}"
 ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
+# Constants relating to '_get_error_message_from_exception'
+ERROR_CODE_UNAVAILABLE = 'Error code Unavailable'
+ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
