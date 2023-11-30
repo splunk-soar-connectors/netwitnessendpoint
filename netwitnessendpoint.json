@@ -7,7 +7,7 @@
     "license": "Copyright (c) 2018-2022 Splunk Inc.",
     "main_module": "netwitnessendpoint_connector.py",
     "type": "endpoint",
-    "app_version": "2.0.8",
+    "app_version": "2.0.9",
     "utctime_updated": "2022-01-19T19:35:55.000000Z",
     "product_vendor": "RSA",
     "product_name": "NetWitness Endpoint",
@@ -19175,32 +19175,12 @@
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
                 "module": "python_dateutil",
                 "input_file": "wheels/shared/python_dateutil-2.8.1-py2.py3-none-any.whl"
             },
             {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
-            },
-            {
                 "module": "six",
                 "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
             }
         ]
     }
