@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_connector.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -146,7 +146,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 return None
 
             if parameter < 0:
-                action_result.set_status(phantom.APP_ERROR, consts.ERR_NEGATIVE_INT_PARAM.format(param=key))
+                action_result.set_status(phantom.APP_ERROR, consts.ERROR_NEGATIVE_INT_PARAM.format(param=key))
                 return None
 
         return parameter
@@ -170,10 +170,10 @@ class NetwitnessendpointConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            self.debug_print(consts.NWENDPOINT_ERR_API_UNSUPPORTED_METHOD.format(method=method))
+            self.debug_print(consts.NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD.format(method=method))
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(
-                phantom.APP_ERROR, consts.NWENDPOINT_ERR_API_UNSUPPORTED_METHOD.format(method=method)), response_data
+                phantom.APP_ERROR, consts.NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD.format(method=method)), response_data
         except Exception as e:
             self.debug_print(consts.NWENDPOINT_EXCEPTION_OCCURRED, e)
             # set the action_result status to error, the handler function will most probably return as is
@@ -197,7 +197,7 @@ class NetwitnessendpointConnector(BaseConnector):
             except Exception as e:
                 # set the action_result status to error, the handler function will most probably return as is
                 return action_result.set_status(
-                    phantom.APP_ERROR, consts.NWENDPOINT_ERR_SERVER_CONNECTION.format(e)), response_data
+                    phantom.APP_ERROR, consts.NWENDPOINT_ERROR_SERVER_CONNECTION.format(e)), response_data
 
             if response.status_code != 401:
                 break
@@ -211,7 +211,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 response_data = response.text
         except Exception as e:
             # r.text is guaranteed to be NON None, it will be empty, but not None
-            msg_string = consts.NWENDPOINT_ERR_JSON_PARSE.format(raw_text=response.text)
+            msg_string = consts.NWENDPOINT_ERROR_JSON_PARSE.format(raw_text=response.text)
             self.debug_print(msg_string, e)
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, msg_string, e), response_data
@@ -223,9 +223,9 @@ class NetwitnessendpointConnector(BaseConnector):
             if isinstance(response_data, dict):
                 message = response_data.get("ResponseStatus", {}).get("Message", message)
 
-            self.debug_print(consts.NWENDPOINT_ERR_FROM_SERVER.format(status=response.status_code, detail=message))
+            self.debug_print(consts.NWENDPOINT_ERROR_FROM_SERVER.format(status=response.status_code, detail=message))
             # set the action_result status to error, the handler function will most probably return as is
-            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERR_FROM_SERVER,
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_FROM_SERVER,
                                             status=response.status_code, detail=message), response_data
         # In case of success scenario
         if response.status_code == consts.NWENDPOINT_REST_RESP_SUCCESS:
@@ -236,11 +236,11 @@ class NetwitnessendpointConnector(BaseConnector):
             return phantom.APP_SUCCESS, response_data
 
         # If response code is unknown
-        self.debug_print(consts.NWENDPOINT_ERR_FROM_SERVER.format(status=response.status_code,
+        self.debug_print(consts.NWENDPOINT_ERROR_FROM_SERVER.format(status=response.status_code,
                                                                   detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG))
         # All other response codes from REST call
         # Set the action_result status to error, the handler function will most probably return as is
-        return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERR_FROM_SERVER,
+        return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_FROM_SERVER,
                                         status=response.status_code,
                                         detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG), response_data
 

@@ -11,7 +11,7 @@ Minimum Product Version: 5.1.0
 This app supports executing various endpoint-based investigative and containment actions on RSA NetWitness Endpoint
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2018-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2018-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."

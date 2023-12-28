@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_consts.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 NWENDPOINT_CONFIG_URL = "url"
 NWENDPOINT_CONFIG_USERNAME = "username"
-NWENDPOINT_CONFIG_PASSWORD = "password"
+NWENDPOINT_CONFIG_PASSWORD = "password"   # pragma: allowlist secret
 NWENDPOINT_CONFIG_VERIFY_SSL = "verify_server_cert"
 NWENDPOINT_CONFIG_MAX_IOC_LEVEL = "max_ioc_level"
 NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
@@ -35,8 +35,8 @@ NWENDPOINT_LIST_MACHINES_ENDPOINT = "/api/v2/machines?format=json"
 NWENDPOINT_CONNECTION_TEST_MSG = "Querying endpoint to verify the credentials provided"
 NWENDPOINT_TEST_CONNECTIVITY_FAIL = "Test Connectivity Failed"
 NWENDPOINT_TEST_CONNECTIVITY_PASS = "Test Connectivity Passed"
-NWENDPOINT_ERR_SERVER_CONNECTION = "Connection failed: {0}"
-NWENDPOINT_ERR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
+NWENDPOINT_ERROR_SERVER_CONNECTION = "Connection failed: {0}"
+NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
 NWENDPOINT_EXCEPTION_OCCURRED = "Exception occurred"
 NWENDPOINT_ERROR_IOC_QUERY_NOT_EXIST = "IIOC name not found"
 NWENDPOINT_REST_RESP_UNAUTHORIZED = 401
@@ -51,8 +51,8 @@ NWENDPOINT_REST_RESOURCE_NOT_FOUND_MSG = "Request not found"
 NWENDPOINT_REST_RESPONSE = "response"
 NWENDPOINT_REST_RESPONSE_HEADERS = "headers"
 NWENDPOINT_REST_RESP_OTHER_ERROR_MSG = "Error returned"
-NWENDPOINT_ERR_FROM_SERVER = "API failed.\nStatus code: {status}\nDetail: {detail}"
-NWENDPOINT_ERR_JSON_PARSE = "Unable to parse the response into a dictionary.\nResponse text - {raw_text}"
+NWENDPOINT_ERROR_FROM_SERVER = "API failed.\nStatus code: {status}\nDetail: {detail}"
+NWENDPOINT_ERROR_JSON_PARSE = "Unable to parse the response into a dictionary.\nResponse text - {raw_text}"
 NWENDPOINT_JSON_DOMAIN = "domain"
 NWENDPOINT_JSON_GUID = "guid"
 NWENDPOINT_JSON_LIMIT = "limit"
@@ -99,4 +99,4 @@ NWENDPOINT_DEFAULT_IOC_SCORE_LTE = 1024
 NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT = 0
 NWENDPOINT_DEFAULT_MIN_MODULE_COUNT = 0
 INVALID_INT = "Please provide a valid integer value in the {param}"
-ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
+ERROR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"

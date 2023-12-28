@@ -4,7 +4,7 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on RSA NetWitness Endpoint",
     "publisher": "Splunk",
     "package_name": "phantom_netwitnessendpoint",
-    "license": "Copyright (c) 2018-2022 Splunk Inc.",
+    "license": "Copyright (c) 2018-2023 Splunk Inc.",
     "main_module": "netwitnessendpoint_connector.py",
     "type": "endpoint",
     "app_version": "2.0.9",
