@@ -668,7 +668,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         action_result.add_data(res[consts.NWENDPOINT_REST_RESPONSE])
         summary_data['guid'] = guid
-        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_SCAN_ENDPOINT_MESSAGE)
+        return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_SCAN_ENDPOINT_MSG)
 
     def _get_scan_data(self, param):
         """ Function used to get scanned data of endpoint.
