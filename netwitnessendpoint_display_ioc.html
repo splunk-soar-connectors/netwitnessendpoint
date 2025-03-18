@@ -1,16 +1,17 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
-
-{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block custom_title_prop %}
+  {% if title_logo %}
+    style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+  {% endif %}
+{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
-{% block custom_tools %}
-{% endblock %}
-
-{% block widget_content %} <!-- Main Start Block -->
-
-<!-- File: netwitnessendpoint_display_ioc.html
-  Copyright (c) 2018-2023 Splunk Inc.
+{% block custom_tools %}{% endblock %}
+{% block widget_content %}
+  <!-- Main Start Block -->
+  <!-- File: netwitnessendpoint_display_ioc.html
+  Copyright (c) 2018-2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +25,7 @@ either express or implied. See the License for the specific language governing p
 and limitations under the License.
 
 -->
-
-<style>
-
+  <style>
     .nweendpoint-ioc a:hover {
         text-decoration:underline;
     }
@@ -72,132 +71,120 @@ and limitations under the License.
         font-weight: bold;
     }
 
-</style>
-
-<div class="nweendpoint-ioc" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
-
-    {% for result in results %} <!-- loop for each result -->
-
-    {% if not result.data.iocQuery %}
-    <h4 class="wf-h4-style">No data found</h4>
-    {% else %}
-
-    <h3 class="wf-h3-style">Info</h3>
-
-    <table class="wf-table-vertical">
-        <tr>
+  </style>
+  <div class="nweendpoint-ioc"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    <!-- Main Div -->
+    {% for result in results %}
+      <!-- loop for each result -->
+      {% if not result.data.iocQuery %}
+        <h4 class="wf-h4-style">No data found</h4>
+      {% else %}
+        <h3 class="wf-h3-style">Info</h3>
+        <table class="wf-table-vertical">
+          <tr>
             <td>Name</td>
             <td>
-            <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.param.name }}
-                    &nbsp;
-                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a>
+              <a href="javascript:;"
+                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.param.name }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
             </td>
-        </tr>
-    </table>
-
-    <h3 class="wf-h3-style">InstantIOC</h3>
-
-    <table class="wf-table-horizontal">
-
-        <tr>
+          </tr>
+        </table>
+        <h3 class="wf-h3-style">InstantIOC</h3>
+        <table class="wf-table-horizontal">
+          <tr>
             <th>Name</th>
             <th>Description</th>
             <th>IOC Level</th>
-            {% if result.data.iocType %}
-                <th>IOC Type</th>
-            {% endif %}
+            {% if result.data.iocType %}<th>IOC Type</th>{% endif %}
             <th>OS Type</th>
             <th>Active</th>
             <th>Alertable</th>
             <th>Query</th>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td>
-            <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.data.iocQuery.Name }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.data.iocQuery.Name }}
-                    &nbsp;
-                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a>
+              <a href="javascript:;"
+                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.data.iocQuery.Name }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.data.iocQuery.Name }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
             </td>
             <td>{{ result.data.iocQuery.Description }}</td>
             <td>{{ result.data.iocQuery.IOCLevel }}</td>
-            {% if result.data.iocType %}
-                <td>{{ result.data.iocType }}</td>
-            {% endif %}
+            {% if result.data.iocType %}<td>{{ result.data.iocType }}</td>{% endif %}
             <td>{{ result.data.iocQuery.Type }}</td>
             <td>{{ result.data.iocQuery.Active }}</td>
             <td>{{ result.data.iocQuery.Alertable }}</td>
             <td>{{ result.data.iocQuery.Query }}</td>
-
-        </tr>
-    </table>
-
-    <h3 class="wf-h3-style">Machines</h3>
-    <table class="wf-table-horizontal datatable">
-        <thead>
+          </tr>
+        </table>
+        <h3 class="wf-h3-style">Machines</h3>
+        <table class="wf-table-horizontal datatable">
+          <thead>
             <tr>
-                <th>Machine Name</th>
-                <th>IIOC Score</th>
-                <th>Admin Status</th>
-                <th>Comment</th>
+              <th>Machine Name</th>
+              <th>IIOC Score</th>
+              <th>Admin Status</th>
+              <th>Comment</th>
             </tr>
-        </thead>
-
-        <tbody>
+          </thead>
+          <tbody>
             {% for machine_index in result.data.iocMachines %}
-            <tr>
+              <tr>
                 <td>{{ machine_index.MachineName }}</td>
                 <td>{{ machine_index.IIOCScore }}</td>
-                <td>{{ machine_index.AdminStatus}}</td>
+                <td>{{ machine_index.AdminStatus }}</td>
                 <td>{{ machine_index.Comment }}</td>
-            </tr>
+              </tr>
             {% endfor %}
-        </tbody>
-    </table>
-
-    <h3 class="wf-h3-style">Modules</h3>
-
-    <table class="wf-table-horizontal datatable">
-        <thead>
+          </tbody>
+        </table>
+        <h3 class="wf-h3-style">Modules</h3>
+        <table class="wf-table-horizontal datatable">
+          <thead>
             <tr>
-                <th>File Name</th>
-                <th>IIOC Score</th>
-                <th>Risk Score</th>
-                <th>Machine Count</th>
-                <th>Signature</th>
-                <th>Hash Lookup</th>
+              <th>File Name</th>
+              <th>IIOC Score</th>
+              <th>Risk Score</th>
+              <th>Machine Count</th>
+              <th>Signature</th>
+              <th>Hash Lookup</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
             {% for module in result.data.iocModules %}
-                <tr>
-                    <td>
-                        <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ module.FileName }}' }], 0, {{ container.id }}, null, false);">
-                            {{ module.FileName }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                    <td>{{ module.IIOCScore }}</td>
-                    <td>{{ module.RiskScore }}</td>
-                    <td>{{ module.MachineCount }}</td>
-                    <td>{{ module.Signature }}</td>
-                    <td>{{ module.HashLookup }}</td>
-                </tr>
+              <tr>
+                <td>
+                  <a href="javascript:;"
+                     onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ module.FileName }}' }], 0, {{ container.id }}, null, false);">
+                    {{ module.FileName }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td>{{ module.IIOCScore }}</td>
+                <td>{{ module.RiskScore }}</td>
+                <td>{{ module.MachineCount }}</td>
+                <td>{{ module.Signature }}</td>
+                <td>{{ module.HashLookup }}</td>
+              </tr>
             {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+          </tbody>
+        </table>
+      {% endif %}
     {% endfor %}
-
-</div>
-
-<script>
+  </div>
+  <script>
 $.extend(true, $.fn.dataTable.defaults, {
     "searching": true,
     "bLengthChange": false,
@@ -216,6 +203,5 @@ $.extend(true, $.fn.dataTable.defaults, {
   });
   $.fn.DataTable.ext.pager.numbers_length = 7;
   $('.datatable').DataTable();
-</script>
-
+  </script>
 {% endblock %}

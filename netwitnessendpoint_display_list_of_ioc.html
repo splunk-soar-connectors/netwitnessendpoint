@@ -1,16 +1,17 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
-
-{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block custom_title_prop %}
+  {% if title_logo %}
+    style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+  {% endif %}
+{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
-{% block custom_tools %}
-{% endblock %}
-
-{% block widget_content %} <!-- Main Start Block -->
-
-<!-- File: netwitnessendpoint_display_list_of_ioc.html
-  Copyright (c) 2018-2023 Splunk Inc.
+{% block custom_tools %}{% endblock %}
+{% block widget_content %}
+  <!-- Main Start Block -->
+  <!-- File: netwitnessendpoint_display_list_of_ioc.html
+  Copyright (c) 2018-2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +25,7 @@ either express or implied. See the License for the specific language governing p
 and limitations under the License.
 
 -->
-
-<style>
-
+  <style>
     .nweendpoint-list-of-ioc a:hover {
         text-decoration:underline;
     }
@@ -63,71 +62,74 @@ and limitations under the License.
         overflow-x: auto;
     }
 
-</style>
-
-<div class="nweendpoint-list-of-ioc" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
-
-    {% for result in results %} <!-- loop for each result -->
-
-    {% if not result.data %}
-    <h4 class="wf-h4-style">No data found</h4>
-    {% else %}
+  </style>
+  <div class="nweendpoint-list-of-ioc"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    <!-- Main Div -->
+    {% for result in results %}
+      <!-- loop for each result -->
+      {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+      {% else %}
         <h3 class="wf-h3-style">IOC details</h3>
         <div class="ioc_table">
-            <table class="wf-table-horizontal datatable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Level</th>
-                        <th>Active</th>
-                        <th>Alertable</th>
-                        <th>Machine Count</th>
-                        <th>Module Count</th>
-                        <th>Last Executed</th>
-                        <th>Blacklisted Count</th>
-                        <th>Whitelisted Count</th>
-                        <th>Graylisted Count</th>
-                        <th>User Defined</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in result.data %}
-                        {% if item.Type == 'Windows' %}
-                        <tr>
-                            <td>
-                                <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ item.Name }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            <td>{{ item.Description }}</td>
-                            <td>{{ item.IOCLevel }}</td>
-                            <td>{{ item.Active }}</td>
-                            <td>{{ item.Alertable }}</td>
-                            <td>{{ item.MachineCount }}</td>
-                            <td>{{ item.ModuleCount }}</td>
-                            <td>{{ item.LastExecuted }}</td>
-                            <td>{{ item.BlacklistedCount }}</td>
-                            <td>{{ item.WhitelistedCount }}</td>
-                            <td>{{ item.GraylistedCount }}</td>
-                            <td>{{ item.UserDefined }}</td>
-                            <td>{{ item.ErrorMessage }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Level</th>
+                <th>Active</th>
+                <th>Alertable</th>
+                <th>Machine Count</th>
+                <th>Module Count</th>
+                <th>Last Executed</th>
+                <th>Blacklisted Count</th>
+                <th>Whitelisted Count</th>
+                <th>Graylisted Count</th>
+                <th>User Defined</th>
+                <th>Error Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data %}
+                {% if item.Type == 'Windows' %}
+                  <tr>
+                    <td>
+                      <a href="javascript:;"
+                         onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ item.Name }}' }], 0, {{ container.id }}, null, false);">
+                        {{ item.Name }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                      </a>
+                    </td>
+                    <td>{{ item.Description }}</td>
+                    <td>{{ item.IOCLevel }}</td>
+                    <td>{{ item.Active }}</td>
+                    <td>{{ item.Alertable }}</td>
+                    <td>{{ item.MachineCount }}</td>
+                    <td>{{ item.ModuleCount }}</td>
+                    <td>{{ item.LastExecuted }}</td>
+                    <td>{{ item.BlacklistedCount }}</td>
+                    <td>{{ item.WhitelistedCount }}</td>
+                    <td>{{ item.GraylistedCount }}</td>
+                    <td>{{ item.UserDefined }}</td>
+                    <td>{{ item.ErrorMessage }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          <br>
         </div>
-    {% endif %}
+      {% endif %}
     {% endfor %}
-</div>
-
-<script>
+  </div>
+  <script>
 $.extend(true, $.fn.dataTable.defaults, {
     "searching": true,
     "bLengthChange": false,
@@ -147,6 +149,5 @@ $.extend(true, $.fn.dataTable.defaults, {
   $('.datatable').DataTable({
      "order":[[2,"asc"]]
     });
-</script>
-
+  </script>
 {% endblock %}

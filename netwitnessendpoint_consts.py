@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_consts.py
 #
-# Copyright (c) 2018-2023 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 NWENDPOINT_CONFIG_URL = "url"
 NWENDPOINT_CONFIG_USERNAME = "username"
-NWENDPOINT_CONFIG_PASSWORD = "password"   # pragma: allowlist secret
+NWENDPOINT_CONFIG_PASSWORD = "password"  # pragma: allowlist secret
 NWENDPOINT_CONFIG_VERIFY_SSL = "verify_server_cert"
 NWENDPOINT_CONFIG_MAX_IOC_LEVEL = "max_ioc_level"
 NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL = "max_ioc_for_scheduled_poll"
