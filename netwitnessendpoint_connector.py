@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_connector.py
 #
-# Copyright (c) 2018-2023 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,12 +29,13 @@ from phantom.base_connector import BaseConnector
 # Local imports
 import netwitnessendpoint_consts as consts
 
+
 # Dictionary containing details of possible HTTP error codes in API Response
 ERROR_RESPONSE_DICT = {
     consts.NWENDPOINT_REST_RESP_UNAUTHORIZED: consts.NWENDPOINT_REST_RESP_UNAUTHORIZED_MSG,
     consts.NWENDPOINT_REST_REQUEST_BINDING_EXCEPTION: consts.NWENDPOINT_REST_REQUEST_BINDING_EXCEPTION_MSG,
     consts.NWENDPOINT_REST_INVALID_PERMISSION: consts.NWENDPOINT_REST_INVALID_PERMISSION_MSG,
-    consts.NWENDPOINT_REST_RESOURCE_NOT_FOUND: consts.NWENDPOINT_REST_RESOURCE_NOT_FOUND_MSG
+    consts.NWENDPOINT_REST_RESOURCE_NOT_FOUND: consts.NWENDPOINT_REST_RESOURCE_NOT_FOUND_MSG,
 }
 
 SCAN_CATEGORY_MAPPING = {
@@ -58,30 +59,24 @@ SCAN_CATEGORY_MAPPING = {
     "Hosts": "8589934592",
     "Suspicious Threads": "34359738368",
     "Windows Patches": "4294967296",
-    "All": "618373327872"
+    "All": "618373327872",
 }
 
 # IOC Level 0: Critical
 # IOC Level 1: High
 # IOC Level 2: Medium
 # IOC Level 3: Low
-IOC_LEVEL_MAPPING = {
-    "0": 1024,
-    "1": 128,
-    "2": 8,
-    "3": 1
-}
+IOC_LEVEL_MAPPING = {"0": 1024, "1": 128, "2": 8, "3": 1}
 
 
 class NetwitnessendpointConnector(BaseConnector):
-    """ This is an AppConnector class that inherits the BaseConnector class. It implements various actions supported by
+    """This is an AppConnector class that inherits the BaseConnector class. It implements various actions supported by
     NetWitness Endpoint and helper methods required to run the actions.
     """
 
     def __init__(self):
-
         # Calling the BaseConnector's init function
-        super(NetwitnessendpointConnector, self).__init__()
+        super().__init__()
         self._url = None
         self._username = None
         self._password = None
@@ -93,7 +88,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return
 
     def initialize(self):
-        """ This is an optional function that can be implemented by the AppConnector derived class. Since the
+        """This is an optional function that can be implemented by the AppConnector derived class. Since the
         configuration dictionary is already validated by the time this function is called, it's a good place to do any
         extra initialization of any internal modules. This function MUST return a value of either phantom.APP_SUCCESS or
         phantom.APP_ERROR. If this function returns phantom.APP_ERROR, then AppConnector::handle_action will not get
@@ -101,14 +96,14 @@ class NetwitnessendpointConnector(BaseConnector):
         """
 
         config = self.get_config()
-        self._url = config[consts.NWENDPOINT_CONFIG_URL].strip('/')
+        self._url = config[consts.NWENDPOINT_CONFIG_URL].strip("/")
         self._username = config[consts.NWENDPOINT_CONFIG_USERNAME]
         self._password = config[consts.NWENDPOINT_CONFIG_PASSWORD]
         self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, False)
-        self._max_ioc_level = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL,
-                                             consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
-        self._max_scheduled_ioc_count = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL,
-                                                       consts.NWENDPOINT_DEFAULT_IOC_COUNT))
+        self._max_ioc_level = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
+        self._max_scheduled_ioc_count = int(
+            config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL, consts.NWENDPOINT_DEFAULT_IOC_COUNT)
+        )
         self.set_validator("ipv6", self._is_ip)
 
         # load the state of app stored in JSON file
@@ -117,7 +112,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _is_ip(self, input_ip_address):
-        """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+        """Function that checks given address and return True if address is valid IPv4 or IPV6 address.
 
         :param input_ip_address: IP address
         :return: status (success/failure)
@@ -152,7 +147,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return parameter
 
     def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
-        """ Function that makes the REST call to the device. It is a generic function that can be called from various
+        """Function that makes the REST call to the device. It is a generic function that can be called from various
         action handlers.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -173,39 +168,35 @@ class NetwitnessendpointConnector(BaseConnector):
             self.debug_print(consts.NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD.format(method=method))
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(
-                phantom.APP_ERROR, consts.NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD.format(method=method)), response_data
+                phantom.APP_ERROR, consts.NWENDPOINT_ERROR_API_UNSUPPORTED_METHOD.format(method=method)
+            ), response_data
         except Exception as e:
             self.debug_print(consts.NWENDPOINT_EXCEPTION_OCCURRED, e)
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_EXCEPTION_OCCURRED, e), response_data
 
-        kwargs = {'data': data,
-                  'params': params,
-                  'auth': (self._username, self._password),
-                  'verify': self._verify_server_cert}
+        kwargs = {"data": data, "params": params, "auth": (self._username, self._password), "verify": self._verify_server_cert}
 
         if timeout is not None:
-            kwargs['timeout'] = timeout
+            kwargs["timeout"] = timeout
 
         # If API will result an unauthorized error, then API will be executed for maximum thrice
         for api_execution_trial in range(0, 3):
-
             # Make the call
             try:
-                response = request_func("{}{}".format(self._url, endpoint), **kwargs)
+                response = request_func(f"{self._url}{endpoint}", **kwargs)
 
             except Exception as e:
                 # set the action_result status to error, the handler function will most probably return as is
-                return action_result.set_status(
-                    phantom.APP_ERROR, consts.NWENDPOINT_ERROR_SERVER_CONNECTION.format(e)), response_data
+                return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_SERVER_CONNECTION.format(e)), response_data
 
             if response.status_code != 401:
                 break
 
         # Try parsing the json
         try:
-            content_type = response.headers.get('content-type')
-            if content_type and content_type.find('json') != -1:
+            content_type = response.headers.get("content-type")
+            if content_type and content_type.find("json") != -1:
                 response_data = response.json()
             else:
                 response_data = response.text
@@ -225,27 +216,29 @@ class NetwitnessendpointConnector(BaseConnector):
 
             self.debug_print(consts.NWENDPOINT_ERROR_FROM_SERVER.format(status=response.status_code, detail=message))
             # set the action_result status to error, the handler function will most probably return as is
-            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_FROM_SERVER,
-                                            status=response.status_code, detail=message), response_data
+            return action_result.set_status(
+                phantom.APP_ERROR, consts.NWENDPOINT_ERROR_FROM_SERVER, status=response.status_code, detail=message
+            ), response_data
         # In case of success scenario
         if response.status_code == consts.NWENDPOINT_REST_RESP_SUCCESS:
-            response_data = {
-                consts.NWENDPOINT_REST_RESPONSE: response_data,
-                consts.NWENDPOINT_REST_RESPONSE_HEADERS: response.headers
-            }
+            response_data = {consts.NWENDPOINT_REST_RESPONSE: response_data, consts.NWENDPOINT_REST_RESPONSE_HEADERS: response.headers}
             return phantom.APP_SUCCESS, response_data
 
         # If response code is unknown
-        self.debug_print(consts.NWENDPOINT_ERROR_FROM_SERVER.format(status=response.status_code,
-                                                                  detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG))
+        self.debug_print(
+            consts.NWENDPOINT_ERROR_FROM_SERVER.format(status=response.status_code, detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG)
+        )
         # All other response codes from REST call
         # Set the action_result status to error, the handler function will most probably return as is
-        return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_FROM_SERVER,
-                                        status=response.status_code,
-                                        detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG), response_data
+        return action_result.set_status(
+            phantom.APP_ERROR,
+            consts.NWENDPOINT_ERROR_FROM_SERVER,
+            status=response.status_code,
+            detail=consts.NWENDPOINT_REST_RESP_OTHER_ERROR_MSG,
+        ), response_data
 
     def _paginate_response_data(self, endpoint, action_result, key, params=None, limit=None):
-        """ Helper function to get paginated data of specified GET API. If limit parameter is not provided, all page's
+        """Helper function to get paginated data of specified GET API. If limit parameter is not provided, all page's
         data will be fetched.
 
         :param endpoint: Endpoint to get data
@@ -268,7 +261,7 @@ class NetwitnessendpointConnector(BaseConnector):
             limit = consts.NWENDPOINT_DEFAULT_LIMIT
             limit_provided = False
         else:
-            limit = self._validate_integer(action_result, limit, 'limit')
+            limit = self._validate_integer(action_result, limit, "limit")
             if limit is None:
                 return action_result.get_status()
             # If limit is less than default value of limit, then querying only specified amount of data
@@ -306,7 +299,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return phantom.APP_SUCCESS, return_list
 
     def _get_machines_modules_per_ioc(self, action_result, ioc_name, iocscore_gte=1):
-        """ Helper function to get machines and modules of an IOC queried.
+        """Helper function to get machines and modules of an IOC queried.
 
         :param action_result: Object of ActionResult class
         :param ioc_name: Name of IOC whose machines and modules are required
@@ -322,8 +315,7 @@ class NetwitnessendpointConnector(BaseConnector):
         ioc_modules = []
 
         # Get list of all machines
-        ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
-                                                               action_result, "Items")
+        ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
 
         # Something went wrong
         if phantom.is_fail(ret_value):
@@ -342,13 +334,12 @@ class NetwitnessendpointConnector(BaseConnector):
                 return action_result.get_status(), ioc_details
 
             # if machine does not have operating system of type "Windows"
-            if not machine_details_resp[consts.NWENDPOINT_REST_RESPONSE]["Machine"][
-                    "OperatingSystem"].__contains__("Windows"):
+            if not machine_details_resp[consts.NWENDPOINT_REST_RESPONSE]["Machine"]["OperatingSystem"].__contains__("Windows"):
                 continue
 
             # get list of all IOCs that are related to machine
             ret_value, machine_ioc_list = self._paginate_response_data(
-                consts.NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT.format(guid=machine['Id']), action_result, "Iocs"
+                consts.NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT.format(guid=machine["Id"]), action_result, "Iocs"
             )
 
             # something went wrong
@@ -356,17 +347,16 @@ class NetwitnessendpointConnector(BaseConnector):
                 return action_result.get_status(), ioc_details
 
             # If machine does not contain requested IOC
-            if not any(ioc_detail['Name'] == ioc_name for ioc_detail in machine_ioc_list):
+            if not any(ioc_detail["Name"] == ioc_name for ioc_detail in machine_ioc_list):
                 continue
 
             machines_per_ioc.append(machine_details_resp[consts.NWENDPOINT_REST_RESPONSE]["Machine"])
-            machine_id = machine['Id']
+            machine_id = machine["Id"]
 
-            self.send_progress("Getting modules for machine {name}, ID {id}".format(name=machine["Name"],
-                                                                                    id=machine_id))
+            self.send_progress("Getting modules for machine {name}, ID {id}".format(name=machine["Name"], id=machine_id))
 
             # Get modules whose IOC score is greater than iocscore_gte
-            params = {'iocscore_gte': iocscore_gte}
+            params = {"iocscore_gte": iocscore_gte}
 
             ret_value, modules = self._paginate_response_data(
                 consts.NWENDPOINT_MACHINES_MODULES_ENDPOINT.format(machine_id), action_result, "Items", params=params
@@ -377,12 +367,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
             # for each module get IOCs in which it is categorized
             for machine_module in modules:
-                module_id = machine_module['Id']
+                module_id = machine_module["Id"]
 
                 # Getting module information for machine
                 ret_value, module_iocs = self._paginate_response_data(
-                    consts.NWENDPOINT_MACHINES_MODULES_INSTANTIOCS_ENDPOINT.format(machine_id, module_id),
-                    action_result, "Iocs")
+                    consts.NWENDPOINT_MACHINES_MODULES_INSTANTIOCS_ENDPOINT.format(machine_id, module_id), action_result, "Iocs"
+                )
 
                 # Something went wrong while getting modules
                 if phantom.is_fail(ret_value):
@@ -390,23 +380,19 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 # Determining if module is related with given IOC
                 for ioc in module_iocs:
-                    if ioc['IOCName'] == ioc_name:
+                    if ioc["IOCName"] == ioc_name:
                         ioc_modules.append(ioc)
                         if ioc_details.get("ioc_type") != ioc["Type"]:
                             ioc_details["ioc_type"] = ioc["Type"]
                         break
 
-        ioc_modules = [dict(module_data) for module_data in set(tuple(ioc_module.items())
-                                                                for ioc_module in ioc_modules)]
+        ioc_modules = [dict(module_data) for module_data in set(tuple(ioc_module.items()) for ioc_module in ioc_modules)]
 
-        ioc_details.update({
-            "machines_per_ioc": machines_per_ioc,
-            "ioc_modules": ioc_modules
-        })
+        ioc_details.update({"machines_per_ioc": machines_per_ioc, "ioc_modules": ioc_modules})
         return True, ioc_details
 
     def _blocklist_domain(self, param):
-        """ Function used to blocklist given domain.
+        """Function used to blocklist given domain.
 
         :param param: dictionary of input parameters
         :return: status status/failure
@@ -422,11 +408,10 @@ class NetwitnessendpointConnector(BaseConnector):
             domain = phantom.get_host_from_url(domain)
 
         # Get mandatory parameter
-        payload = {'Domains': [domain]}
+        payload = {"Domains": [domain]}
 
         # Make the call
-        return_val, response = self._make_rest_call(consts.NWENDPOINT_BLOCKLIST_DOMAIN_ENDPOINT, action_result,
-                                                    data=payload)
+        return_val, response = self._make_rest_call(consts.NWENDPOINT_BLOCKLIST_DOMAIN_ENDPOINT, action_result, data=payload)
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -435,13 +420,13 @@ class NetwitnessendpointConnector(BaseConnector):
         # Changing response to make it eligible for contextual actions
         domain_name = response[consts.NWENDPOINT_REST_RESPONSE]["Domains"][0]
         response = {"domain": domain_name}
-        summary_data['domain'] = domain_name
+        summary_data["domain"] = domain_name
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_DOMAIN_SUCCESS)
 
     def _blocklist_ip(self, param):
-        """ Function used to blocklist given IP.
+        """Function used to blocklist given IP.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -454,21 +439,20 @@ class NetwitnessendpointConnector(BaseConnector):
         payload = {"Ips": [param[consts.NWENDPOINT_JSON_IP_ADDRESS]]}
 
         # Make the call
-        ret_value, response = self._make_rest_call(consts.NWENDPOINT_BLOCK_IP_ENDPOINT, action_result=action_result,
-                                                   data=payload)
+        ret_value, response = self._make_rest_call(consts.NWENDPOINT_BLOCK_IP_ENDPOINT, action_result=action_result, data=payload)
 
         # something went wrong
         if phantom.is_fail(ret_value):
             return action_result.get_status()
         ip = response[consts.NWENDPOINT_REST_RESPONSE]["Ips"][0]
         response = {"ip": ip}
-        summary_data['ip'] = ip
+        summary_data["ip"] = ip
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_BLOCKLIST_IP_SUCCESS)
 
     def _list_endpoints(self, param):
-        """ Function used to get list of all endpoints configured on RSA NetWitness Endpoint.
+        """Function used to get list of all endpoints configured on RSA NetWitness Endpoint.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -478,11 +462,13 @@ class NetwitnessendpointConnector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # Get optional parameters
-        ioc_score_gte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE,
-            consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE), 'ioc_score_gte')
-        ioc_score_lte = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE,
-            consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE), 'ioc_score_lte')
-        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
+        ioc_score_gte = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_GTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_GTE), "ioc_score_gte"
+        )
+        ioc_score_lte = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_IOC_SCORE_LTE, consts.NWENDPOINT_DEFAULT_IOC_SCORE_LTE), "ioc_score_lte"
+        )
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), "limit")
 
         if ioc_score_lte is None or ioc_score_gte is None or limit is None:
             return action_result.set_status(phantom.APP_ERROR)
@@ -495,22 +481,20 @@ class NetwitnessendpointConnector(BaseConnector):
             params[consts.NWENDPOINT_JSON_IOC_SCORE_LTE] = ioc_score_lte
         else:
             self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
-            return action_result.set_status(
-                phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_PARAM_OUT_OF_RANGE)
 
         # If given ioc_score_lte is less than given ioc_score_gte
         if ioc_score_lte < ioc_score_gte:
-            self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
-                upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte"
-            ))
-            return action_result.set_status(
-                phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
-                    upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte"
-                )
+            self.debug_print(
+                consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte")
             )
-        ret_value, response = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
-                                                           action_result, "Items", params=param,
-                                                           limit=limit)
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(upper_bound_var="ioc_score_gte", lower_bound_var="ioc_score_lte"),
+            )
+        ret_value, response = self._paginate_response_data(
+            consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items", params=param, limit=limit
+        )
 
         # Filtering out machines having operating system other than Windows
         for machine_data in response:
@@ -532,7 +516,7 @@ class NetwitnessendpointConnector(BaseConnector):
             return action_result.get_status()
 
         # Update summary data
-        summary_data['total_endpoints'] = len(machine_list)
+        summary_data["total_endpoints"] = len(machine_list)
 
         # replicating API response by adding key to list
         action_result.add_data({"Items": machine_list})
@@ -540,7 +524,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_system_info(self, param):
-        """ Function used to get endpoint's information from given endpoint's guid.
+        """Function used to get endpoint's information from given endpoint's guid.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -553,8 +537,7 @@ class NetwitnessendpointConnector(BaseConnector):
         guid = param[consts.NWENDPOINT_JSON_GUID]
 
         # Make the call
-        return_val, response = self._make_rest_call(
-            consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(guid), action_result, method="get")
+        return_val, response = self._make_rest_call(consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(guid), action_result, method="get")
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -563,13 +546,13 @@ class NetwitnessendpointConnector(BaseConnector):
         action_result.add_data(response[consts.NWENDPOINT_REST_RESPONSE])
 
         # Update summary data
-        summary_data['machine_name'] = response[consts.NWENDPOINT_REST_RESPONSE]['Machine']['MachineName']
-        summary_data['iiocscore'] = response[consts.NWENDPOINT_REST_RESPONSE]['Machine']['IIOCScore']
+        summary_data["machine_name"] = response[consts.NWENDPOINT_REST_RESPONSE]["Machine"]["MachineName"]
+        summary_data["iiocscore"] = response[consts.NWENDPOINT_REST_RESPONSE]["Machine"]["IIOCScore"]
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _scan_endpoint(self, param):
-        """ Function used to request scan of an endpoint.
+        """Function used to request scan of an endpoint.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -584,15 +567,19 @@ class NetwitnessendpointConnector(BaseConnector):
         # Get optional parameters
         filter_hooks = param.get(consts.NWENDPOINT_JSON_FILTER_HOOKS, consts.NWENDPOINT_DEFAULT_FILTER_HOOKS)
 
-        cpu_max = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX,
-            consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), 'cpu_max')
-        cpu_max_vm = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM,
-            consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), 'cpu_max_vm')
-        cpu_min = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN,
-            consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), 'cpu_min')
+        cpu_max = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_CPUMAX, consts.NWENDPOINT_DEFAULT_MAX_CPU_VALUE), "cpu_max"
+        )
+        cpu_max_vm = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_CPUMAXVM, consts.NWENDPOINT_DEFAULT_MAX_CPU_VM_VALUE), "cpu_max_vm"
+        )
+        cpu_min = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), "cpu_min"
+        )
 
-        scan_category = SCAN_CATEGORY_MAPPING.get(param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY,
-                                                            param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)))
+        scan_category = SCAN_CATEGORY_MAPPING.get(
+            param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY, param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY))
+        )
         if cpu_max is None or cpu_max_vm is None or cpu_min is None:
             return action_result.set_status(phantom.APP_ERROR)
 
@@ -601,56 +588,47 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Update request data according to value of filter_hooks
         if filter_hooks == "Signed Modules":
-            payload['FilterSigned'] = True
+            payload["FilterSigned"] = True
         elif filter_hooks == "Whitelisted Certificates":
-            payload['FilterTrustedRoot'] = True
+            payload["FilterTrustedRoot"] = True
 
         # Validate that cpu_max is positive integer and update the request parameters
         if cpu_max <= 100:
             payload["CpuMax"] = cpu_max
         else:
             self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max"))
-            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                perc_var="cpu_max"
-            ))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max"))
 
         # Validate that cpu_max is positive integer and update the request parameters
         if cpu_max_vm <= 100:
             payload["CpuMaxVm"] = cpu_max_vm
         else:
             self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max_vm"))
-            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                perc_var="cpu_max_vm"
-            ))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_max_vm"))
 
         # Validate that cpu_min is positive integer and update the request parameters
         if cpu_min <= 100:
             payload["CpuMin"] = cpu_min
         else:
             self.debug_print(consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_min"))
-            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(
-                perc_var="cpu_min"
-            ))
+            return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_PERCENTAGE_ERROR.format(perc_var="cpu_min"))
 
         # If given ioc_score_gte is less than given ioc_score_lte
         if cpu_max < cpu_min:
-            self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
-                upper_bound_var="cpu_max", lower_bound_var="cpu_min"
-            ))
+            self.debug_print(consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(upper_bound_var="cpu_max", lower_bound_var="cpu_min"))
             return action_result.set_status(
-                phantom.APP_ERROR, consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(
-                    upper_bound_var="cpu_max", lower_bound_var="cpu_min"
-                )
+                phantom.APP_ERROR,
+                consts.NWENDPOINT_JSON_IOC_SCORE_COMPARISION_ERROR.format(upper_bound_var="cpu_max", lower_bound_var="cpu_min"),
             )
 
-        optional_params_dict = {"ScanCategory": scan_category,
-                                "CaptureFloatingCode": param.get(consts.NWENDPOINT_JSON_CAPTURE_FLOATING_CODE),
-                                "AllNetworkConnections": param.get(consts.NWENDPOINT_JSON_ALL_NETWORK_CONNECTIONS),
-                                "ResetAgentNetworkCache": param.get(
-                                    consts.NWENDPOINT_JSON_RESET_AGENT_NETWORK_CACHE),
-                                "RetrieveMasterBootRecord": param.get(
-                                    consts.NWENDPOINT_JSON_RETRIEVE_MASTER_BOOT_RECORD),
-                                "Notify": param.get(consts.NWENDPOINT_JSON_NOTIFY)}
+        optional_params_dict = {
+            "ScanCategory": scan_category,
+            "CaptureFloatingCode": param.get(consts.NWENDPOINT_JSON_CAPTURE_FLOATING_CODE),
+            "AllNetworkConnections": param.get(consts.NWENDPOINT_JSON_ALL_NETWORK_CONNECTIONS),
+            "ResetAgentNetworkCache": param.get(consts.NWENDPOINT_JSON_RESET_AGENT_NETWORK_CACHE),
+            "RetrieveMasterBootRecord": param.get(consts.NWENDPOINT_JSON_RETRIEVE_MASTER_BOOT_RECORD),
+            "Notify": param.get(consts.NWENDPOINT_JSON_NOTIFY),
+        }
 
         # Prepare parameters dictionary from optional_params_dict by eliminating keys having None value
         optional_params_dict = dict((key, value) for key, value in optional_params_dict.items() if value)
@@ -659,19 +637,18 @@ class NetwitnessendpointConnector(BaseConnector):
         payload.update(optional_params_dict)
 
         # Make the call
-        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(guid), action_result,
-                                               data=payload)
+        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(guid), action_result, data=payload)
 
         # Something went wrong
         if phantom.is_fail(return_val):
             return action_result.get_status()
 
         action_result.add_data(res[consts.NWENDPOINT_REST_RESPONSE])
-        summary_data['guid'] = guid
+        summary_data["guid"] = guid
         return action_result.set_status(phantom.APP_SUCCESS, consts.NWENDPOINT_SCAN_ENDPOINT_MSG)
 
     def _get_scan_data(self, param):
-        """ Function used to get scanned data of endpoint.
+        """Function used to get scanned data of endpoint.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -681,14 +658,27 @@ class NetwitnessendpointConnector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # List of scan categories for which we need to fetch data
-        type_mappings = ["Services", 'Processes', "Dlls", "Drivers", "AutoRuns", "Tasks", "ImageHooks", "KernelHooks",
-                         "WindowsHooks", "SuspiciousThreads", "RegistryDiscrepencies", "Network", "Tracking"]
+        type_mappings = [
+            "Services",
+            "Processes",
+            "Dlls",
+            "Drivers",
+            "AutoRuns",
+            "Tasks",
+            "ImageHooks",
+            "KernelHooks",
+            "WindowsHooks",
+            "SuspiciousThreads",
+            "RegistryDiscrepencies",
+            "Network",
+            "Tracking",
+        ]
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
 
         # Get optional parameter
-        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), "limit")
 
         # Validate that limit is positive integer
         if limit is None:
@@ -698,12 +688,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Iterate over each scan category and fetch corresponding data
         for value in type_mappings:
-
-            self.send_progress("Getting data for {}".format(value))
+            self.send_progress(f"Getting data for {value}")
 
             # Get data for scan category
             ret_value, response = self._paginate_response_data(
-                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(guid, value.lower()), action_result, value, limit=limit)
+                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(guid, value.lower()), action_result, value, limit=limit
+            )
 
             # Something went wrong
             if phantom.is_fail(ret_value):
@@ -727,13 +717,13 @@ class NetwitnessendpointConnector(BaseConnector):
 
         fips_enabled = is_fips_enabled()
         if fips_enabled:
-            self.debug_print('FIPS is enabled')
+            self.debug_print("FIPS is enabled")
         else:
-            self.debug_print('FIPS is not enabled')
+            self.debug_print("FIPS is not enabled")
         return fips_enabled
 
     def _create_dict_hash(self, input_dict):
-        """ Function used to create hash of the given input dictionary.
+        """Function used to create hash of the given input dictionary.
 
         :param input_dict: dictionary for which we need to generate hash
         :return: MD5 hash
@@ -747,7 +737,7 @@ class NetwitnessendpointConnector(BaseConnector):
         try:
             input_dict_str = json.dumps(input_dict, sort_keys=True)
         except Exception as e:
-            self.debug_print('Handled exception in _create_dict_hash', e)
+            self.debug_print("Handled exception in _create_dict_hash", e)
             return None
 
         fips_enabled = self._get_fips_enabled()
@@ -757,7 +747,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return hashlib.sha256(input_dict_str.encode()).hexdigest()
 
     def _list_ioc(self, param):
-        """ Function used to List available IOCs.
+        """Function used to List available IOCs.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -768,32 +758,37 @@ class NetwitnessendpointConnector(BaseConnector):
         matching_ioc_records = []
 
         # get optional input parameter to filter response
-        machine_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT,
-            consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT), 'machine_count')
-        module_count = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_MODULE_COUNT,
-            consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), 'module_count')
-        ioc_level = self._validate_integer(action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL,
-            consts.NWENDPOINT_DEFAULT_IOC_LEVEL), 'ioc_level')
+        machine_count = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_MACHINE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MACHINE_COUNT), "machine_count"
+        )
+        module_count = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_JSON_MODULE_COUNT, consts.NWENDPOINT_DEFAULT_MIN_MODULE_COUNT), "module_count"
+        )
+        ioc_level = self._validate_integer(
+            action_result, param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL), "ioc_level"
+        )
 
-        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), 'limit')
+        limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), "limit")
 
         if limit is None or machine_count is None or module_count is None or ioc_level is None:
             return action_result.get_status()
 
         # Get list of all IOCs
-        ret_value, ioc_list = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT,
-                                                           action_result, "iocQueries")
+        ret_value, ioc_list = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result, "iocQueries")
 
         # Something went wrong
         if phantom.is_fail(ret_value):
             return action_result.get_status()
 
-        ioc_list = sorted(ioc_list, key=lambda k: int(k['IOCLevel']))
+        ioc_list = sorted(ioc_list, key=lambda k: int(k["IOCLevel"]))
 
         for ioc_detail in ioc_list:
-            if (int(ioc_detail['IOCLevel']) <= ioc_level) and \
-                    (int(ioc_detail['MachineCount']) >= machine_count) and \
-                    (int(ioc_detail['ModuleCount']) >= module_count) and ioc_detail["Type"] == "Windows":
+            if (
+                (int(ioc_detail["IOCLevel"]) <= ioc_level)
+                and (int(ioc_detail["MachineCount"]) >= machine_count)
+                and (int(ioc_detail["ModuleCount"]) >= module_count)
+                and ioc_detail["Type"] == "Windows"
+            ):
                 matching_ioc_records.append(ioc_detail)
 
             if 0 < limit == len(matching_ioc_records):
@@ -803,12 +798,12 @@ class NetwitnessendpointConnector(BaseConnector):
             action_result.add_data(ioc)
 
         # Update summary data
-        summary_data['available_iocs'] = len(matching_ioc_records)
+        summary_data["available_iocs"] = len(matching_ioc_records)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_ioc(self, param):
-        """ Get IOC detail.
+        """Get IOC detail.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -824,42 +819,34 @@ class NetwitnessendpointConnector(BaseConnector):
         ioc_level = param.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL)
 
         # get list of all IOCs
-        ret_value, response = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result,
-                                                           "iocQueries")
+        ret_value, response = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result, "iocQueries")
 
         # something went wrong
         if phantom.is_fail(ret_value):
             return action_result.get_status()
 
         # Get details of only that IOC whose name matches with requested IOC and whose type is Windows
-        ioc_query = next((ioc for ioc in response if ioc["Name"].lower() == name.lower() and ioc['Type'].lower() == "windows"), None)
+        ioc_query = next((ioc for ioc in response if ioc["Name"].lower() == name.lower() and ioc["Type"].lower() == "windows"), None)
 
         # If IOC is not available on server it will return empty dictionary
         if not ioc_query:
             self.debug_print(consts.NWENDPOINT_ERROR_IOC_QUERY_NOT_EXIST)
             return action_result.set_status(phantom.APP_ERROR, consts.NWENDPOINT_ERROR_IOC_QUERY_NOT_EXIST)
 
-        summary_data['ioc_level'] = ioc_query['IOCLevel']
+        summary_data["ioc_level"] = ioc_query["IOCLevel"]
 
         # Iterate over all machines and get modules of only those machines which are related with requested IOC and
         # having type="Windows"
-        status, ioc_details = self._get_machines_modules_per_ioc(
-            action_result, name, iocscore_gte=IOC_LEVEL_MAPPING[str(ioc_level)]
-        )
+        status, ioc_details = self._get_machines_modules_per_ioc(action_result, name, iocscore_gte=IOC_LEVEL_MAPPING[str(ioc_level)])
 
         # Something went wrong while getting machines and modules for IOC
         if not status:
             return action_result.get_status()
 
-        ioc_modules = [dict(module_data) for module_data in set(tuple(ioc_module.items())
-                                                                for ioc_module in ioc_details["ioc_modules"])]
+        ioc_modules = [dict(module_data) for module_data in set(tuple(ioc_module.items()) for ioc_module in ioc_details["ioc_modules"])]
 
         # Adding details of IOC, its machines and modules in action result
-        response = {
-            "iocQuery": ioc_query,
-            "iocMachines": ioc_details["machines_per_ioc"],
-            "iocModules": ioc_modules
-        }
+        response = {"iocQuery": ioc_query, "iocMachines": ioc_details["machines_per_ioc"], "iocModules": ioc_modules}
 
         if ioc_details.get("ioc_type"):
             response["iocType"] = ioc_details["ioc_type"]
@@ -873,7 +860,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _ingest_data(self, ioc_query_list):
-        """ Function used to create containers and artifacts from the provided ioc_query_list.
+        """Function used to create containers and artifacts from the provided ioc_query_list.
 
         :param ioc_query_list: list of ioc queries and corresponding machine and modules(files) information using which
         we need to prepare container and artifacts.
@@ -887,7 +874,7 @@ class NetwitnessendpointConnector(BaseConnector):
             "AgentID": {"cef": "nweMachineGuid", "cef_types": ["nwe machine guid"]},
             "UserName": {"cef": "sourceUserName", "cef_types": ["user name"]},
             "IIOCScore": {"cef": "iiocScore", "cef_types": []},
-            "MachineName": {"cef": "machineName", "cef_types": []}
+            "MachineName": {"cef": "machineName", "cef_types": []},
         }
 
         # mapping for files related artifacts
@@ -897,7 +884,7 @@ class NetwitnessendpointConnector(BaseConnector):
             "SHA256": {"cef": "fileHashSha256", "cef_types": ["hash", "sha256"]},
             "FileName": {"cef": "fileName", "cef_types": ["file name"]},
             "RiskScore": {"cef": "riskScore", "cef_types": []},
-            "IIOCScore": {"cef": "iiocScore", "cef_types": []}
+            "IIOCScore": {"cef": "iiocScore", "cef_types": []},
         }
 
         # mapping of IOCScore with severity of artifacts
@@ -905,16 +892,18 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Creating container for each IOC query and creating its artifacts
         for ioc in ioc_query_list:
-            self.send_progress("Ingesting data for IOC: {name}. Total artifacts to ingest: {count}".format(
-                name=ioc["Name"], count=str(len(ioc["iocMachines"]) + len(ioc["iocModules"]) + 1)
-            ))
+            self.send_progress(
+                "Ingesting data for IOC: {name}. Total artifacts to ingest: {count}".format(
+                    name=ioc["Name"], count=str(len(ioc["iocMachines"]) + len(ioc["iocModules"]) + 1)
+                )
+            )
             source_data_identifiers = []
             # Creating container
             container = {
                 "name": "{}-{}".format(ioc["Name"], ioc["Type"]),
                 "description": ioc["Description"],
                 "data": json.dumps(ioc),
-                "source_data_identifier": "{}-{}".format(ioc["Name"], ioc["Type"])
+                "source_data_identifier": "{}-{}".format(ioc["Name"], ioc["Type"]),
             }
 
             self.send_progress("Ingesting data for: {}".format(ioc["Name"]))
@@ -959,7 +948,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 source_data_identifiers.append(source_data_identifier)
 
                 # The source_data_identifier should be created after all the keys have been set
-                artifact['source_data_identifier'] = source_data_identifier
+                artifact["source_data_identifier"] = source_data_identifier
                 ret_value, status_string, artifact_id = self.save_artifact(artifact)
 
                 # Something went wrong while creating artifacts
@@ -986,7 +975,8 @@ class NetwitnessendpointConnector(BaseConnector):
                     continue
 
                 artifact = {
-                    "name": "File Artifact", "description": consts.NWENDPOINT_ARTIFACTS_DESC,
+                    "name": "File Artifact",
+                    "description": consts.NWENDPOINT_ARTIFACTS_DESC,
                     "cef_types": cef_types,
                     "cef": cef,
                     "container_id": container_id,
@@ -1001,7 +991,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 source_data_identifiers.append(source_data_identifier)
 
                 # The source_data_identifier should be created after all the keys have been set.
-                artifact['source_data_identifier'] = source_data_identifier
+                artifact["source_data_identifier"] = source_data_identifier
                 ret_value, status_string, artifact_id = self.save_artifact(artifact)
 
                 # Something went wrong while creating artifacts
@@ -1010,8 +1000,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     continue
 
             # Adding IIOC details as artifact
-            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"],
-                   "iocLevel": ioc["IOCLevel"], "osType": ioc["Type"]}
+            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"], "iocLevel": ioc["IOCLevel"], "osType": ioc["Type"]}
 
             # If Module type is found in IOC, then it will be added to the artifact
             if ioc.get("ioc_type"):
@@ -1020,13 +1009,14 @@ class NetwitnessendpointConnector(BaseConnector):
             cef_types = {"instantIocName": ["nwe ioc name"]}
 
             artifact = {
-                "name": "Instant IOC Artifact", "description": consts.NWENDPOINT_ARTIFACTS_DESC,
+                "name": "Instant IOC Artifact",
+                "description": consts.NWENDPOINT_ARTIFACTS_DESC,
                 "cef_types": cef_types,
                 "cef": cef,
                 "container_id": container_id,
-                "run_automation": True
+                "run_automation": True,
             }
-            artifact['source_data_identifier'] = self._create_dict_hash(artifact)
+            artifact["source_data_identifier"] = self._create_dict_hash(artifact)
             ret_value, status_string, artifact_id = self.save_artifact(artifact)
 
             # Something went wrong while creating artifacts
@@ -1035,7 +1025,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 continue
 
     def _get_machine_data(self, action_result, ioc_query_list):
-        """ Function used to obtain endpoint data for each query in ioc_query_list.
+        """Function used to obtain endpoint data for each query in ioc_query_list.
 
         :param action_result: object of ActionResult class
         :param ioc_query_list: list of ioc queries for which data needs to be fetched
@@ -1049,8 +1039,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Iterate through each IOC query and obtain corresponding machine related information
         for ioc in ioc_query_list:
-            query_name = ioc['Name']
-            self.send_progress("Getting machines and modules for IOC: {i}".format(i=query_name))
+            query_name = ioc["Name"]
+            self.send_progress(f"Getting machines and modules for IOC: {query_name}")
 
             # Scheduled ingestion
             if not self.is_poll_now():
@@ -1064,8 +1054,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Add data only if the execution time of IOC query is different or if its a new IOC query
                 if not (saved_app_state.get(query_name) == ioc["LastExecuted"]):
                     # Get data
-                    ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
-                                                                           action_result, "Items")
+                    ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
                     # Something went wrong
                     if phantom.is_fail(ret_value):
                         return action_result.get_status()
@@ -1076,15 +1065,14 @@ class NetwitnessendpointConnector(BaseConnector):
             # Poll now
             else:
                 # Get list of all machines
-                ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT,
-                                                                       action_result, "Items")
+                ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
 
                 # Something went wrong
                 if phantom.is_fail(ret_value):
                     return action_result.get_status()
 
-            ioc['iocMachines'] = []
-            ioc['iocModules'] = []
+            ioc["iocMachines"] = []
+            ioc["iocModules"] = []
             machines_modules_ioc = {}
 
             # get modules of machines
@@ -1099,8 +1087,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     return action_result.get_status()
 
                 # if machine does not have operating system of type "Windows"
-                if not machine_details_resp[consts.NWENDPOINT_REST_RESPONSE]["Machine"][
-                        "OperatingSystem"].__contains__("Windows"):
+                if not machine_details_resp[consts.NWENDPOINT_REST_RESPONSE]["Machine"]["OperatingSystem"].__contains__("Windows"):
                     continue
 
                 # get machine GUID
@@ -1108,8 +1095,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 # get list of all IOCs that are related to machine
                 ret_value, machine_ioc_list = self._paginate_response_data(
-                    consts.NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT.format(guid=ioc_machine['Id']), action_result,
-                    "Iocs"
+                    consts.NWENDPOINT_INSTANTIOCS_PER_MACHINE_ENDPOINT.format(guid=ioc_machine["Id"]), action_result, "Iocs"
                 )
 
                 # something went wrong
@@ -1117,7 +1103,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     return action_result.get_status()
 
                 # If machine does not contain requested IOC
-                if not any(ioc_detail['Name'] == query_name for ioc_detail in machine_ioc_list):
+                if not any(ioc_detail["Name"] == query_name for ioc_detail in machine_ioc_list):
                     continue
 
                 # The machine is confirmed to be a Windows machine and is correlated with the current IOC
@@ -1125,7 +1111,6 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 # Checking if modules of the machines are already cached
                 if guid not in machines_modules_ioc.keys():
-
                     # IOC Score is dependent on IOC Level
                     # providing IOC Score to get modules
                     params = {"iocscore_gte": IOC_LEVEL_MAPPING[str(self._max_ioc_level)]}
@@ -1143,15 +1128,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
                     # get IOC details of each module
                     for machine_module in modules:
-
                         # If duplicate module information is found
-                        if machine_module["Name"] in module_details.keys() and machine_module in \
-                                module_details[machine_module["Name"]]:
+                        if machine_module["Name"] in module_details.keys() and machine_module in module_details[machine_module["Name"]]:
                             continue
 
                         ret_value, response = self._paginate_response_data(
-                            consts.NWENDPOINT_MACHINES_MODULES_INSTANTIOCS_ENDPOINT.format(guid, machine_module["Id"]),
-                            action_result, "Iocs"
+                            consts.NWENDPOINT_MACHINES_MODULES_INSTANTIOCS_ENDPOINT.format(guid, machine_module["Id"]), action_result, "Iocs"
                         )
 
                         if phantom.is_fail(ret_value):
@@ -1159,8 +1141,10 @@ class NetwitnessendpointConnector(BaseConnector):
 
                         # if module belongs to given IOC, add it into the list
                         for machine_ioc_module_detail in response:
-                            if machine_ioc_module_detail['IOCName'] == query_name and \
-                                    int(machine_ioc_module_detail["IOCLevel"]) <= self._max_ioc_level:
+                            if (
+                                machine_ioc_module_detail["IOCName"] == query_name
+                                and int(machine_ioc_module_detail["IOCLevel"]) <= self._max_ioc_level
+                            ):
                                 module_ioc.append(machine_ioc_module_detail)
                                 # Getting module type of IOC
                                 if ioc.get("ioc_type") != machine_ioc_module_detail["Type"]:
@@ -1172,24 +1156,21 @@ class NetwitnessendpointConnector(BaseConnector):
 
                         module_details[machine_module["Name"]].append(machine_module)
 
-                    self.save_progress("Total modules selected from machine: {m} is {n}".format(
-                        m=guid, n=len(module_ioc)
-                    ))
+                    self.save_progress(f"Total modules selected from machine: {guid} is {len(module_ioc)}")
                     # caching modules response to be used if same machine is listed in another IOC
                     machines_modules_ioc[guid] = module_ioc
 
                 # Adding modules information
-                ioc['iocModules'] += machines_modules_ioc[guid]
+                ioc["iocModules"] += machines_modules_ioc[guid]
 
-        ioc_query_list = [ioc for ioc in ioc_query_list if 'iocMachines' in ioc.keys()]
-        self.save_progress("Total number of IOCs retrieved to ingest: {ioc_count}".format(
-            ioc_count=len(ioc_query_list)))
+        ioc_query_list = [ioc for ioc in ioc_query_list if "iocMachines" in ioc.keys()]
+        self.save_progress(f"Total number of IOCs retrieved to ingest: {len(ioc_query_list)}")
         self._ingest_data(ioc_query_list)
 
         return phantom.APP_SUCCESS
 
     def _on_poll(self, param):
-        """ Function used to ingest endpoint and files related artifacts.
+        """Function used to ingest endpoint and files related artifacts.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -1197,15 +1178,13 @@ class NetwitnessendpointConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         source_ids = param.get("container_id")
-        container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT,
-                                        consts.NWENDPOINT_DEFAULT_POLL_NOW_CONTAINER_COUNT))
+        container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT, consts.NWENDPOINT_DEFAULT_POLL_NOW_CONTAINER_COUNT))
 
         instant_iocs = list()
 
         self.save_progress("Fetching instant IOCs")
         # Getting list of IOCs
-        ret_value, ioc_queries = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result,
-                                                              "iocQueries")
+        ret_value, ioc_queries = self._paginate_response_data(consts.NWENDPOINT_INSTANTIOC_ENDPOINT, action_result, "iocQueries")
 
         # Something went wrong while getting list of IOCs
         if phantom.is_fail(ret_value):
@@ -1216,8 +1195,13 @@ class NetwitnessendpointConnector(BaseConnector):
             self.save_progress("Filtering IOCs")
 
             # Filter IOCs
-            instant_iocs = [ioc for ioc in ioc_queries if int(ioc['IOCLevel']) <= self._max_ioc_level and (
-                    ioc['MachineCount'] != '0' or ioc['ModuleCount'] != '0') and ioc["Type"] == "Windows"]
+            instant_iocs = [
+                ioc
+                for ioc in ioc_queries
+                if int(ioc["IOCLevel"]) <= self._max_ioc_level
+                and (ioc["MachineCount"] != "0" or ioc["ModuleCount"] != "0")
+                and ioc["Type"] == "Windows"
+            ]
 
         # If source_id is available
         else:
@@ -1227,16 +1211,20 @@ class NetwitnessendpointConnector(BaseConnector):
 
             # Iterate through source_id and fetch the corresponding IOCs
             for source_id in source_id_list:
-                self.send_progress("Fetching data for IOC: {ioc_name}".format(ioc_name=source_id))
+                self.send_progress(f"Fetching data for IOC: {source_id}")
                 for ioc in ioc_queries:
                     # Fetching IOC detail
-                    if ioc["Name"] == source_id and int(ioc['IOCLevel']) <= self._max_ioc_level and \
-                            (ioc['MachineCount'] != '0' or ioc['ModuleCount'] != '0') and ioc["Type"] == "Windows":
+                    if (
+                        ioc["Name"] == source_id
+                        and int(ioc["IOCLevel"]) <= self._max_ioc_level
+                        and (ioc["MachineCount"] != "0" or ioc["ModuleCount"] != "0")
+                        and ioc["Type"] == "Windows"
+                    ):
                         instant_iocs.append(ioc)
                         break
 
         # Sorting list of IOCs based on its last executed time
-        instant_iocs.sort(key=lambda item: parse(item['LastExecuted']), reverse=True)
+        instant_iocs.sort(key=lambda item: parse(item["LastExecuted"]), reverse=True)
 
         # Manual ingestion and Scheduled ingestion
         if source_ids is None:
@@ -1245,7 +1233,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 instant_iocs = instant_iocs[:container_count]
             else:
                 # Get list of IOCs equal to or less then the configured ingestion count for scheduled polling
-                instant_iocs = instant_iocs[:self._max_scheduled_ioc_count]
+                instant_iocs = instant_iocs[: self._max_scheduled_ioc_count]
 
         if instant_iocs:
             response_status = self._get_machine_data(action_result, instant_iocs)
@@ -1255,7 +1243,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def finalize(self):
-        """ This function gets called once all the param dictionary elements are looped over and no more handle_action
+        """This function gets called once all the param dictionary elements are looped over and no more handle_action
         calls are left to be made. It gives the AppConnector a chance to loop through all the results that were
         accumulated by multiple handle_action function calls and create any summary if required. Another usage is
         cleanup, disconnect from remote devices etc.
@@ -1265,7 +1253,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _test_asset_connectivity(self, param):
-        """ This function tests the connectivity of an asset with given credentials.
+        """This function tests the connectivity of an asset with given credentials.
 
         :param param: (not used in this method)
         :return: status success/failure
@@ -1274,11 +1262,10 @@ class NetwitnessendpointConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult())
 
         self.save_progress(consts.NWENDPOINT_CONNECTION_TEST_MSG)
-        self.save_progress("Configured URL: {}".format(self._url))
+        self.save_progress(f"Configured URL: {self._url}")
 
         # making call
-        ret_value, response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result,
-                                                   method="get", timeout=300)
+        ret_value, response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result, method="get", timeout=300)
 
         # something went wrong
         if phantom.is_fail(ret_value):
@@ -1290,7 +1277,7 @@ class NetwitnessendpointConnector(BaseConnector):
         return action_result.get_status()
 
     def handle_action(self, param):
-        """ This function gets current action identifier and calls member function of its own to handle the action.
+        """This function gets current action identifier and calls member function of its own to handle the action.
 
         :param param: dictionary which contains information about the actions to be executed
         :return: status success/failure
@@ -1298,16 +1285,16 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Dictionary mapping each action with its corresponding actions
         supported_actions = {
-            'blocklist_domain': self._blocklist_domain,
-            'get_scan_data': self._get_scan_data,
-            'list_endpoints': self._list_endpoints,
-            'blocklist_ip': self._blocklist_ip,
-            'scan_endpoint': self._scan_endpoint,
-            'get_system_info': self._get_system_info,
-            'get_ioc': self._get_ioc,
-            'test_asset_connectivity': self._test_asset_connectivity,
-            'on_poll': self._on_poll,
-            'list_ioc': self._list_ioc
+            "blocklist_domain": self._blocklist_domain,
+            "get_scan_data": self._get_scan_data,
+            "list_endpoints": self._list_endpoints,
+            "blocklist_ip": self._blocklist_ip,
+            "scan_endpoint": self._scan_endpoint,
+            "get_system_info": self._get_system_info,
+            "get_ioc": self._get_ioc,
+            "test_asset_connectivity": self._test_asset_connectivity,
+            "on_poll": self._on_poll,
+            "list_ioc": self._list_ioc,
         }
 
         action = self.get_action_identifier()
@@ -1315,20 +1302,19 @@ class NetwitnessendpointConnector(BaseConnector):
         try:
             run_action = supported_actions[action]
         except:
-            raise ValueError('action %r is not supported' % action)
+            raise ValueError(f"action {action!r} is not supported")
 
         return run_action(param)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     import sys
 
     import pudb
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print('No test json specified as input')
+        print("No test json specified as input")
         sys.exit(0)
 
     with open(sys.argv[1]) as f:
