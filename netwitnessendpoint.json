@@ -7,12 +7,15 @@
     "license": "Copyright (c) 2018-2025 Splunk Inc.",
     "main_module": "netwitnessendpoint_connector.py",
     "type": "endpoint",
-    "app_version": "2.0.10",
-    "utctime_updated": "2025-04-29T17:44:57.135359Z",
+    "app_version": "2.0.11",
+    "utctime_updated": "2025-07-30T17:50:49.629213Z",
     "product_vendor": "RSA",
     "product_name": "NetWitness Endpoint",
     "product_version_regex": ".*",
-    "python_version": ["3.9", "3.13"],
+    "python_version": [
+        "3.9",
+        "3.13"
+    ],
     "min_phantom_version": "5.1.0",
     "fips_compliant": true,
     "latest_tested_versions": [

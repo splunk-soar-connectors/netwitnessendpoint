@@ -1,7 +1,7 @@
 # NetWitness Endpoint
 
 Publisher: Splunk \
-Connector Version: 2.0.10 \
+Connector Version: 2.0.11 \
 Product Vendor: RSA \
 Product Name: NetWitness Endpoint \
 Minimum Product Version: 5.1.0
