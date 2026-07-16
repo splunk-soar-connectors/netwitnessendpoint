@@ -1,9 +1,9 @@
 # NetWitness Endpoint
 
-Publisher: Splunk \
-Connector Version: 2.0.12 \
-Product Vendor: RSA \
-Product Name: NetWitness Endpoint \
+Publisher: Splunk <br>
+Connector Version: 2.0.12 <br>
+Product Vendor: RSA <br>
+Product Name: NetWitness Endpoint <br>
 Minimum Product Version: 5.1.0
 
 This app supports executing various endpoint-based investigative and containment actions on RSA NetWitness Endpoint
@@ -40,22 +40,22 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate credentials provided for connectivity \
-[blocklist domain](#action-blocklist-domain) - Blocklist the domain \
-[blocklist ip](#action-blocklist-ip) - Blocklist the IP \
-[list endpoints](#action-list-endpoints) - Lists all the windows endpoints configured on NetWitness Endpoint \
-[get system info](#action-get-system-info) - Get information about an endpoint \
-[scan endpoint](#action-scan-endpoint) - Scan an endpoint \
-[get scan data](#action-get-scan-data) - Get scan data of an endpoint \
-[on poll](#action-on-poll) - Action to ingest endpoint related information \
-[list ioc](#action-list-ioc) - List the IOC \
+[test connectivity](#action-test-connectivity) - Validate credentials provided for connectivity <br>
+[blocklist domain](#action-blocklist-domain) - Blocklist the domain <br>
+[blocklist ip](#action-blocklist-ip) - Blocklist the IP <br>
+[list endpoints](#action-list-endpoints) - Lists all the windows endpoints configured on NetWitness Endpoint <br>
+[get system info](#action-get-system-info) - Get information about an endpoint <br>
+[scan endpoint](#action-scan-endpoint) - Scan an endpoint <br>
+[get scan data](#action-get-scan-data) - Get scan data of an endpoint <br>
+[on poll](#action-on-poll) - Action to ingest endpoint related information <br>
+[list ioc](#action-list-ioc) - List the IOC <br>
 [get ioc](#action-get-ioc) - Get the IOC
 
 ## action: 'test connectivity'
 
 Validate credentials provided for connectivity
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -70,7 +70,7 @@ No Output
 
 Blocklist the domain
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -96,7 +96,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Blocklist the IP
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -122,7 +122,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lists all the windows endpoints configured on NetWitness Endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit</b> parameter is 0 or not specified, the action will fetch all the windows endpoints.
@@ -157,7 +157,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about an endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -299,8 +299,8 @@ summary.total_objects_successful | numeric | | 1 |
 
 Scan an endpoint
 
-Type: **investigate** \
-Read only: **True**
+Type: **generic** <br>
+Read only: **False**
 
 Typical values for <b>scan_category</b> parameter are: <ul><li>None</li><li>Drivers</li><li>Processes</li><li>Kernel Hooks</li><li>Windows Hooks</li><li>Autoruns</li><li>Network</li><li>Services</li><li>Image Hooks</li><li>Files</li><li>Registry Discrepancies</li><li>Dlls</li><li>Security Products</li><li>Network Shares</li><li>Current Users</li><li>Loaded Files</li><li>Tasks</li><li>Hosts</li><li>Suspicious Threads</li><li>Windows Patches</li><li>All</li></ul>
 
@@ -348,7 +348,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get scan data of an endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action will return the latest scan results. If the latest scan was done with a specific category, the resulting scan results may not contain data for all categories. If the <b>limit</b> parameter is 0 or not specified, the action will fetch complete data of all categories and for any other valid value, the action will fetch data equal to the limit specified for each category. For a particular category, if the limit specified is greater than the available data, the action will fetch all data for that category.
@@ -2629,7 +2629,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Action to ingest endpoint related information
 
-Type: **ingest** \
+Type: **ingest** <br>
 Read only: **True**
 
 This action ingests all the IOCs having OS type "Windows", IOC level <b>max_ioc_level</b> and lower and whose machine count and module count are greater than 0. The IOCs fetched are ordered concerning time. Containers are uniquely identified by IOC Description and its OS type. The information of affected machines and modules of an IOC is ingested as artifacts. During manual polling, the number of IOCs to be ingested can be controlled by <b>container_count</b>, and during scheduled polling, the number of IOCs to be ingested in each cycle can be controlled by <b>max_ioc_for_scheduled_poll</b>.<br></p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha256, fileName, iiocScore, riskScore</td></tr><tr><td>Endpoint Details</td><td>Endpoint Artifact</td><td>nweMachineGuid, sourceAddress, remoteAddress, sourceUserName, sourceMacAddress, iiocScore, machineName</td></tr><tr><td>Instant IOC Details</td><td>Instant IOC Artifact</td><td>instantIocName, iocLevel, iocType, lastExecutedTime, osType</td></tr></tbody></table>
@@ -2652,7 +2652,7 @@ No Output
 
 List the IOC
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action lists all IOCs having OS type "Windows".<br>The results are always sorted in ascending order based on their IOC level to place the most critical IOCs at the top. For example, to get the top 10 critical IOCs that matched the filter, specify the <b>limit</b> as 10. If the <b>limit</b> is zero, then all matching IOCs will be returned.
@@ -2712,7 +2712,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the IOC
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action will fetch details of only windows machines whose modules are having IOC level <b>max_ioc_level</b> and lower and are related to the given IOC name.
@@ -3080,7 +3080,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

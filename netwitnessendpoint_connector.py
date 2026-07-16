@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_connector.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -549,9 +549,7 @@ class NetwitnessendpointConnector(BaseConnector):
         encoded_guid = quote(str(guid), safe="")
 
         # Make the call
-        return_val, response = self._make_rest_call(
-            consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(encoded_guid), action_result, method="get"
-        )
+        return_val, response = self._make_rest_call(consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(encoded_guid), action_result, method="get")
 
         # Something went wrong
         if phantom.is_fail(return_val):
