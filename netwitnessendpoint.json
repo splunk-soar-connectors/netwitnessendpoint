@@ -1360,9 +1360,9 @@
             "action": "scan endpoint",
             "description": "Scan an endpoint",
             "verbose": "Typical values for <b>scan_category</b> parameter are: <ul><li>None</li><li>Drivers</li><li>Processes</li><li>Kernel Hooks</li><li>Windows Hooks</li><li>Autoruns</li><li>Network</li><li>Services</li><li>Image Hooks</li><li>Files</li><li>Registry Discrepancies</li><li>Dlls</li><li>Security Products</li><li>Network Shares</li><li>Current Users</li><li>Loaded Files</li><li>Tasks</li><li>Hosts</li><li>Suspicious Threads</li><li>Windows Patches</li><li>All</li></ul>",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "scan_endpoint",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "guid": {
                     "description": "Machine GUID",
