@@ -895,9 +895,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # mapping of IOCScore with severity of artifacts
         phantom_severity_mapping = {"0": "high", "1": "medium", "2": "low", "3": "low"}
+        successfully_ingested_queries = set()
+        save_failure_count = 0
 
         # Creating container for each IOC query and creating its artifacts
         for ioc in ioc_query_list:
+            query_saved_successfully = True
             artifact_severity = phantom_severity_mapping.get(str(ioc.get("IOCLevel", "")).strip(), "high")
             self.send_progress(
                 "Ingesting data for IOC: {name}. Total artifacts to ingest: {count}".format(
@@ -920,6 +923,7 @@ class NetwitnessendpointConnector(BaseConnector):
             # Something went wrong while creating container
             if phantom.is_fail(ret_value):
                 self.debug_print(consts.NWENDPOINT_CONTAINER_ERROR, container)
+                save_failure_count += 1
                 continue
 
             # Creating endpoint related artifacts
@@ -961,6 +965,8 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
                     self.debug_print(status_string, artifact)
+                    query_saved_successfully = False
+                    save_failure_count += 1
                     continue
 
             # Creating module(file) related artifacts
@@ -1004,6 +1010,8 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
                     self.debug_print(status_string, artifact)
+                    query_saved_successfully = False
+                    save_failure_count += 1
                     continue
 
             # Adding IIOC details as artifact
@@ -1029,7 +1037,14 @@ class NetwitnessendpointConnector(BaseConnector):
             # Something went wrong while creating artifacts
             if phantom.is_fail(ret_value):
                 self.debug_print(status_string, artifact)
+                query_saved_successfully = False
+                save_failure_count += 1
                 continue
+
+            if query_saved_successfully:
+                successfully_ingested_queries.add(ioc["Name"])
+
+        return successfully_ingested_queries, save_failure_count
 
     def _get_machine_data(self, action_result, ioc_query_list):
         """Function used to obtain endpoint data for each query in ioc_query_list.
@@ -1043,6 +1058,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
         if self.is_poll_now():
             self.save_progress("Ignoring maximum artifact count")
+
+        checkpoint_candidates = {}
 
         # Iterate through each IOC query and obtain corresponding machine related information
         for ioc in ioc_query_list:
@@ -1059,15 +1076,16 @@ class NetwitnessendpointConnector(BaseConnector):
                     self._app_state["app_state"] = dict()
                 saved_app_state = self._app_state.get("app_state")
                 # Add data only if the execution time of IOC query is different or if its a new IOC query
-                if not (saved_app_state.get(query_name) == ioc["LastExecuted"]):
-                    # Get data
-                    ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
-                    # Something went wrong
-                    if phantom.is_fail(ret_value):
-                        return action_result.get_status()
+                if saved_app_state.get(query_name) == ioc["LastExecuted"]:
+                    continue
 
-                    # Update the state of app
-                    self._app_state["app_state"][query_name] = ioc["LastExecuted"]
+                # Get data
+                ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
+                # Something went wrong
+                if phantom.is_fail(ret_value):
+                    return action_result.get_status()
+
+                checkpoint_candidates[query_name] = ioc["LastExecuted"]
 
             # Poll now
             else:
@@ -1172,7 +1190,17 @@ class NetwitnessendpointConnector(BaseConnector):
 
         ioc_query_list = [ioc for ioc in ioc_query_list if "iocMachines" in ioc.keys()]
         self.save_progress(f"Total number of IOCs retrieved to ingest: {len(ioc_query_list)}")
-        self._ingest_data(ioc_query_list)
+        successfully_ingested_queries, save_failure_count = self._ingest_data(ioc_query_list)
+
+        for query_name in successfully_ingested_queries:
+            if query_name in checkpoint_candidates:
+                self._app_state["app_state"][query_name] = checkpoint_candidates[query_name]
+
+        if save_failure_count:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Failed to save {save_failure_count} container or artifact record(s); affected IOC checkpoints were not advanced",
+            )
 
         return phantom.APP_SUCCESS
 

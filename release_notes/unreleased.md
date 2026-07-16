@@ -5,3 +5,4 @@
 * Security: Encode endpoint GUIDs before inserting them into request paths.
 * Security: Classify the state-changing scan endpoint action as generic and not read-only.
 * Security: Normalize upstream IOC levels and fail safely to high severity for unknown values.
+* Security: Advance scheduled-poll checkpoints only after every record for an IOC is saved successfully.
