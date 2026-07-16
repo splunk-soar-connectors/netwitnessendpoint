@@ -18,6 +18,7 @@
 import hashlib
 import ipaddress
 import json
+from urllib.parse import quote
 
 # Phantom imports
 import phantom.app as phantom
@@ -535,9 +536,12 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
 
         # Make the call
-        return_val, response = self._make_rest_call(consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(guid), action_result, method="get")
+        return_val, response = self._make_rest_call(
+            consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(encoded_guid), action_result, method="get"
+        )
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -562,6 +566,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
         summary_data = action_result.update_summary({})
 
         # Get optional parameters
@@ -637,7 +642,7 @@ class NetwitnessendpointConnector(BaseConnector):
         payload.update(optional_params_dict)
 
         # Make the call
-        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(guid), action_result, data=payload)
+        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(encoded_guid), action_result, data=payload)
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -676,6 +681,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
 
         # Get optional parameter
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), "limit")
@@ -692,7 +698,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
             # Get data for scan category
             ret_value, response = self._paginate_response_data(
-                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(guid, value.lower()), action_result, value, limit=limit
+                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(encoded_guid, value.lower()), action_result, value, limit=limit
             )
 
             # Something went wrong
