@@ -1,3 +1,3 @@
 **Unreleased**
 
-* Chore: prepare the ESPM-5228 vulnerability remediation series.
+* Security: Enable TLS certificate verification by default while preserving an explicit opt-out.

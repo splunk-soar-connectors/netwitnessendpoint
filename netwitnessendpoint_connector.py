@@ -99,7 +99,7 @@ class NetwitnessendpointConnector(BaseConnector):
         self._url = config[consts.NWENDPOINT_CONFIG_URL].strip("/")
         self._username = config[consts.NWENDPOINT_CONFIG_USERNAME]
         self._password = config[consts.NWENDPOINT_CONFIG_PASSWORD]
-        self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, False)
+        self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, True)
         self._max_ioc_level = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
         self._max_scheduled_ioc_count = int(
             config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL, consts.NWENDPOINT_DEFAULT_IOC_COUNT)
