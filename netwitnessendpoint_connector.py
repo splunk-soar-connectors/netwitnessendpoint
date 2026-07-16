@@ -1,6 +1,6 @@
 # File: netwitnessendpoint_connector.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 import hashlib
 import ipaddress
 import json
+from urllib.parse import quote
 
 # Phantom imports
 import phantom.app as phantom
@@ -99,7 +100,7 @@ class NetwitnessendpointConnector(BaseConnector):
         self._url = config[consts.NWENDPOINT_CONFIG_URL].strip("/")
         self._username = config[consts.NWENDPOINT_CONFIG_USERNAME]
         self._password = config[consts.NWENDPOINT_CONFIG_PASSWORD]
-        self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, False)
+        self._verify_server_cert = config.get(consts.NWENDPOINT_CONFIG_VERIFY_SSL, True)
         self._max_ioc_level = int(config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_LEVEL, consts.NWENDPOINT_DEFAULT_IOC_LEVEL))
         self._max_scheduled_ioc_count = int(
             config.get(consts.NWENDPOINT_CONFIG_MAX_IOC_COUNT_SCHEDULED_POLL, consts.NWENDPOINT_DEFAULT_IOC_COUNT)
@@ -272,8 +273,11 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Variable that will be used to fetch specific amount of information from the response
         pending_data_length = limit
+        max_pages = consts.NWENDPOINT_DEFAULT_MAX_PAGES
+        if limit_provided:
+            max_pages = min(max_pages, max(1, (limit + consts.NWENDPOINT_DEFAULT_LIMIT - 1) // consts.NWENDPOINT_DEFAULT_LIMIT))
 
-        while True:
+        for page_count in range(1, max_pages + 1):
             # Making the call
             response_status, response = self._make_rest_call(endpoint, action_result, params=params, method="get")
 
@@ -285,7 +289,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 return_list += response[consts.NWENDPOINT_REST_RESPONSE][key][:pending_data_length]
 
             if limit_provided:
-                if len(return_list) == limit:
+                if len(return_list) >= limit:
                     break
 
                 # next expected amount of information to fetch from the response
@@ -293,8 +297,15 @@ class NetwitnessendpointConnector(BaseConnector):
 
             params["page"] += 1
 
-            if response[consts.NWENDPOINT_REST_RESPONSE_HEADERS].get("Link", "").find('rel="next",') == -1:
+            has_next_page = response[consts.NWENDPOINT_REST_RESPONSE_HEADERS].get("Link", "").find('rel="next",') != -1
+            if not has_next_page:
                 break
+
+            if page_count == max_pages:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Pagination exceeded the maximum of {max_pages} pages",
+                ), None
 
         return phantom.APP_SUCCESS, return_list
 
@@ -535,9 +546,10 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
 
         # Make the call
-        return_val, response = self._make_rest_call(consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(guid), action_result, method="get")
+        return_val, response = self._make_rest_call(consts.NWENDPOINT_GET_SYSTEM_INFO_ENDPOINT.format(encoded_guid), action_result, method="get")
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -562,6 +574,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
         summary_data = action_result.update_summary({})
 
         # Get optional parameters
@@ -637,7 +650,7 @@ class NetwitnessendpointConnector(BaseConnector):
         payload.update(optional_params_dict)
 
         # Make the call
-        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(guid), action_result, data=payload)
+        return_val, res = self._make_rest_call(consts.NWENDPOINT_SCAN_ENDPOINT.format(encoded_guid), action_result, data=payload)
 
         # Something went wrong
         if phantom.is_fail(return_val):
@@ -676,6 +689,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Get mandatory parameter
         guid = param[consts.NWENDPOINT_JSON_GUID]
+        encoded_guid = quote(str(guid), safe="")
 
         # Get optional parameter
         limit = self._validate_integer(action_result, param.get(consts.NWENDPOINT_JSON_LIMIT, consts.NWENDPOINT_DEFAULT_LIMIT), "limit")
@@ -692,7 +706,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
             # Get data for scan category
             ret_value, response = self._paginate_response_data(
-                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(guid, value.lower()), action_result, value, limit=limit
+                consts.NWENDPOINT_GET_SCAN_DATA_ENDPOINT.format(encoded_guid, value.lower()), action_result, value, limit=limit
             )
 
             # Something went wrong
@@ -889,9 +903,13 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # mapping of IOCScore with severity of artifacts
         phantom_severity_mapping = {"0": "high", "1": "medium", "2": "low", "3": "low"}
+        successfully_ingested_queries = set()
+        save_failure_count = 0
 
         # Creating container for each IOC query and creating its artifacts
         for ioc in ioc_query_list:
+            query_saved_successfully = True
+            artifact_severity = phantom_severity_mapping.get(str(ioc.get("IOCLevel", "")).strip(), "high")
             self.send_progress(
                 "Ingesting data for IOC: {name}. Total artifacts to ingest: {count}".format(
                     name=ioc["Name"], count=str(len(ioc["iocMachines"]) + len(ioc["iocModules"]) + 1)
@@ -913,6 +931,7 @@ class NetwitnessendpointConnector(BaseConnector):
             # Something went wrong while creating container
             if phantom.is_fail(ret_value):
                 self.debug_print(consts.NWENDPOINT_CONTAINER_ERROR, container)
+                save_failure_count += 1
                 continue
 
             # Creating endpoint related artifacts
@@ -937,7 +956,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     "cef_types": cef_types,
                     "cef": cef,
                     "container_id": container_id,
-                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                    "severity": artifact_severity,
                 }
 
                 # ignoring same artifacts based on hash
@@ -954,6 +973,8 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
                     self.debug_print(status_string, artifact)
+                    query_saved_successfully = False
+                    save_failure_count += 1
                     continue
 
             # Creating module(file) related artifacts
@@ -980,7 +1001,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     "cef_types": cef_types,
                     "cef": cef,
                     "container_id": container_id,
-                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                    "severity": artifact_severity,
                 }
 
                 # ignoring same artifacts based on hash
@@ -997,6 +1018,8 @@ class NetwitnessendpointConnector(BaseConnector):
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
                     self.debug_print(status_string, artifact)
+                    query_saved_successfully = False
+                    save_failure_count += 1
                     continue
 
             # Adding IIOC details as artifact
@@ -1022,7 +1045,14 @@ class NetwitnessendpointConnector(BaseConnector):
             # Something went wrong while creating artifacts
             if phantom.is_fail(ret_value):
                 self.debug_print(status_string, artifact)
+                query_saved_successfully = False
+                save_failure_count += 1
                 continue
+
+            if query_saved_successfully:
+                successfully_ingested_queries.add(ioc["Name"])
+
+        return successfully_ingested_queries, save_failure_count
 
     def _get_machine_data(self, action_result, ioc_query_list):
         """Function used to obtain endpoint data for each query in ioc_query_list.
@@ -1036,6 +1066,8 @@ class NetwitnessendpointConnector(BaseConnector):
 
         if self.is_poll_now():
             self.save_progress("Ignoring maximum artifact count")
+
+        checkpoint_candidates = {}
 
         # Iterate through each IOC query and obtain corresponding machine related information
         for ioc in ioc_query_list:
@@ -1052,15 +1084,16 @@ class NetwitnessendpointConnector(BaseConnector):
                     self._app_state["app_state"] = dict()
                 saved_app_state = self._app_state.get("app_state")
                 # Add data only if the execution time of IOC query is different or if its a new IOC query
-                if not (saved_app_state.get(query_name) == ioc["LastExecuted"]):
-                    # Get data
-                    ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
-                    # Something went wrong
-                    if phantom.is_fail(ret_value):
-                        return action_result.get_status()
+                if saved_app_state.get(query_name) == ioc["LastExecuted"]:
+                    continue
 
-                    # Update the state of app
-                    self._app_state["app_state"][query_name] = ioc["LastExecuted"]
+                # Get data
+                ret_value, machine_list = self._paginate_response_data(consts.NWENDPOINT_LIST_MACHINES_ENDPOINT, action_result, "Items")
+                # Something went wrong
+                if phantom.is_fail(ret_value):
+                    return action_result.get_status()
+
+                checkpoint_candidates[query_name] = ioc["LastExecuted"]
 
             # Poll now
             else:
@@ -1165,7 +1198,17 @@ class NetwitnessendpointConnector(BaseConnector):
 
         ioc_query_list = [ioc for ioc in ioc_query_list if "iocMachines" in ioc.keys()]
         self.save_progress(f"Total number of IOCs retrieved to ingest: {len(ioc_query_list)}")
-        self._ingest_data(ioc_query_list)
+        successfully_ingested_queries, save_failure_count = self._ingest_data(ioc_query_list)
+
+        for query_name in successfully_ingested_queries:
+            if query_name in checkpoint_candidates:
+                self._app_state["app_state"][query_name] = checkpoint_candidates[query_name]
+
+        if save_failure_count:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Failed to save {save_failure_count} container or artifact record(s); affected IOC checkpoints were not advanced",
+            )
 
         return phantom.APP_SUCCESS
 

@@ -4,7 +4,7 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on RSA NetWitness Endpoint",
     "publisher": "Splunk",
     "package_name": "phantom_netwitnessendpoint",
-    "license": "Copyright (c) 2018-2025 Splunk Inc.",
+    "license": "Copyright (c) 2018-2026 Splunk Inc.",
     "main_module": "netwitnessendpoint_connector.py",
     "type": "endpoint",
     "app_version": "2.0.12",
@@ -31,7 +31,7 @@
             "description": "Verify server certificate",
             "data_type": "boolean",
             "order": 1,
-            "default": false
+            "default": true
         },
         "username": {
             "required": true,
@@ -1360,9 +1360,9 @@
             "action": "scan endpoint",
             "description": "Scan an endpoint",
             "verbose": "Typical values for <b>scan_category</b> parameter are: <ul><li>None</li><li>Drivers</li><li>Processes</li><li>Kernel Hooks</li><li>Windows Hooks</li><li>Autoruns</li><li>Network</li><li>Services</li><li>Image Hooks</li><li>Files</li><li>Registry Discrepancies</li><li>Dlls</li><li>Security Products</li><li>Network Shares</li><li>Current Users</li><li>Loaded Files</li><li>Tasks</li><li>Hosts</li><li>Suspicious Threads</li><li>Windows Patches</li><li>All</li></ul>",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "scan_endpoint",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "guid": {
                     "description": "Machine GUID",
@@ -19171,5 +19171,11 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }

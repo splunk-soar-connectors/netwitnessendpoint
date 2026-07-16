@@ -11,7 +11,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!-- File: netwitnessendpoint_display_ioc.html
-  Copyright (c) 2018-2025 Splunk Inc.
+  Copyright (c) 2018-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ and limitations under the License.
             <td>Name</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.param.name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.name }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -113,7 +113,7 @@ and limitations under the License.
           <tr>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.data.iocQuery.Name }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['nwe ioc name'], 'value': '{{ result.data.iocQuery.Name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.data.iocQuery.Name }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -166,7 +166,7 @@ and limitations under the License.
               <tr>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ module.FileName }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ module.FileName|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ module.FileName }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
