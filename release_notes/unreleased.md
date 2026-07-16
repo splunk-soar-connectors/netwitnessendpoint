@@ -6,3 +6,4 @@
 * Security: Classify the state-changing scan endpoint action as generic and not read-only.
 * Security: Normalize upstream IOC levels and fail safely to high severity for unknown values.
 * Security: Advance scheduled-poll checkpoints only after every record for an IOC is saved successfully.
+* Security: Bound API pagination and stop once a requested record limit is reached.

@@ -273,8 +273,11 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Variable that will be used to fetch specific amount of information from the response
         pending_data_length = limit
+        max_pages = consts.NWENDPOINT_DEFAULT_MAX_PAGES
+        if limit_provided:
+            max_pages = min(max_pages, max(1, (limit + consts.NWENDPOINT_DEFAULT_LIMIT - 1) // consts.NWENDPOINT_DEFAULT_LIMIT))
 
-        while True:
+        for page_count in range(1, max_pages + 1):
             # Making the call
             response_status, response = self._make_rest_call(endpoint, action_result, params=params, method="get")
 
@@ -286,7 +289,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 return_list += response[consts.NWENDPOINT_REST_RESPONSE][key][:pending_data_length]
 
             if limit_provided:
-                if len(return_list) == limit:
+                if len(return_list) >= limit:
                     break
 
                 # next expected amount of information to fetch from the response
@@ -294,8 +297,15 @@ class NetwitnessendpointConnector(BaseConnector):
 
             params["page"] += 1
 
-            if response[consts.NWENDPOINT_REST_RESPONSE_HEADERS].get("Link", "").find('rel="next",') == -1:
+            has_next_page = response[consts.NWENDPOINT_REST_RESPONSE_HEADERS].get("Link", "").find('rel="next",') != -1
+            if not has_next_page:
                 break
+
+            if page_count == max_pages:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Pagination exceeded the maximum of {max_pages} pages",
+                ), None
 
         return phantom.APP_SUCCESS, return_list
 
