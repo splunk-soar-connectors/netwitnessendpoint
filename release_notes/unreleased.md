@@ -4,3 +4,4 @@
 * Security: Escape attacker-controlled IOC widget values before embedding them in JavaScript handlers.
 * Security: Encode endpoint GUIDs before inserting them into request paths.
 * Security: Classify the state-changing scan endpoint action as generic and not read-only.
+* Security: Normalize upstream IOC levels and fail safely to high severity for unknown values.

@@ -898,6 +898,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         # Creating container for each IOC query and creating its artifacts
         for ioc in ioc_query_list:
+            artifact_severity = phantom_severity_mapping.get(str(ioc.get("IOCLevel", "")).strip(), "high")
             self.send_progress(
                 "Ingesting data for IOC: {name}. Total artifacts to ingest: {count}".format(
                     name=ioc["Name"], count=str(len(ioc["iocMachines"]) + len(ioc["iocModules"]) + 1)
@@ -943,7 +944,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     "cef_types": cef_types,
                     "cef": cef,
                     "container_id": container_id,
-                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                    "severity": artifact_severity,
                 }
 
                 # ignoring same artifacts based on hash
@@ -986,7 +987,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     "cef_types": cef_types,
                     "cef": cef,
                     "container_id": container_id,
-                    "severity": phantom_severity_mapping[ioc["IOCLevel"]],
+                    "severity": artifact_severity,
                 }
 
                 # ignoring same artifacts based on hash
