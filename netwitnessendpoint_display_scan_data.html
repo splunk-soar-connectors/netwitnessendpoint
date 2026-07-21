@@ -400,337 +400,337 @@ and limitations under the License.
                       </a>
                     </td>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="Tasks_div">
-            <h3 class="wf-h3-style">Tasks</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="Tasks_div">
+          <h3 class="wf-h3-style">Tasks</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>IIOC Score</th>
+                <th>Risk Score</th>
+                <th>Signature</th>
+                <th>Machine Count</th>
+                <th>Hash Lookup</th>
+                <th>Trigger</th>
+                <th>Next Run Time</th>
+                <th>Last Run Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data.Tasks %}
                 <tr>
-                  <th>File Name</th>
-                  <th>IIOC Score</th>
-                  <th>Risk Score</th>
-                  <th>Signature</th>
-                  <th>Machine Count</th>
-                  <th>Hash Lookup</th>
-                  <th>Trigger</th>
-                  <th>Next Run Time</th>
-                  <th>Last Run Time</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.FileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.FileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.IIOCScore }}</td>
+                  <td>{{ item.RiskScore }}</td>
+                  <td>{{ item.Signature }}</td>
+                  <td>{{ item.MachineCount }}</td>
+                  <td>{{ item.HashLookup }}</td>
+                  <td>{{ item.Trigger }}</td>
+                  <td>{{ item.NextRunTime }}</td>
+                  <td>{{ item.LastRunTime }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data.Tasks %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.FileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.FileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.IIOCScore }}</td>
-                    <td>{{ item.RiskScore }}</td>
-                    <td>{{ item.Signature }}</td>
-                    <td>{{ item.MachineCount }}</td>
-                    <td>{{ item.HashLookup }}</td>
-                    <td>{{ item.Trigger }}</td>
-                    <td>{{ item.NextRunTime }}</td>
-                    <td>{{ item.LastRunTime }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="ImageHooks_div">
-            <h3 class="wf-h3-style">Image Hooks</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="ImageHooks_div">
+          <h3 class="wf-h3-style">Image Hooks</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Hooker Module File Name</th>
+                <th>IIOC Score</th>
+                <th>Risk Score</th>
+                <th>Hooked Process</th>
+                <th>Hooked Module File Name</th>
+                <th>Hooked Symbol</th>
+                <th>Machine Count</th>
+                <th>Signature</th>
+                <th>Hash Lookup</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data|by_key:"ImageHooks" %}
                 <tr>
-                  <th>Hooker Module File Name</th>
-                  <th>IIOC Score</th>
-                  <th>Risk Score</th>
-                  <th>Hooked Process</th>
-                  <th>Hooked Module File Name</th>
-                  <th>Hooked Symbol</th>
-                  <th>Machine Count</th>
-                  <th>Signature</th>
-                  <th>Hash Lookup</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookerModuleFileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.HookerModuleFileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.IIOCScore }}</td>
+                  <td>{{ item.RiskScore }}</td>
+                  <td>{{ item.HookedProcess }}</td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookedModuleFileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.HookedModuleFileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.HookedSymbol }}</td>
+                  <td>{{ item.MachineCount }}</td>
+                  <td>{{ item.Signature }}</td>
+                  <td>{{ item.HashLookup }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data|by_key:"ImageHooks" %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookerModuleFileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.HookerModuleFileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.IIOCScore }}</td>
-                    <td>{{ item.RiskScore }}</td>
-                    <td>{{ item.HookedProcess }}</td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookedModuleFileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.HookedModuleFileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.HookedSymbol }}</td>
-                    <td>{{ item.MachineCount }}</td>
-                    <td>{{ item.Signature }}</td>
-                    <td>{{ item.HashLookup }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="KernelHooks_div">
-            <h3 class="wf-h3-style">Kernel Hooks</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="KernelHooks_div">
+          <h3 class="wf-h3-style">Kernel Hooks</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Hooker Module File Name</th>
+                <th>IIOC Score</th>
+                <th>Risk Score</th>
+                <th>Kernel Hooked Type</th>
+                <th>Object Name</th>
+                <th>Function Name</th>
+                <th>Machine Count</th>
+                <th>Signature</th>
+                <th>Hash Lookup</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data|by_key:"KernelHooks" %}
                 <tr>
-                  <th>Hooker Module File Name</th>
-                  <th>IIOC Score</th>
-                  <th>Risk Score</th>
-                  <th>Kernel Hooked Type</th>
-                  <th>Object Name</th>
-                  <th>Function Name</th>
-                  <th>Machine Count</th>
-                  <th>Signature</th>
-                  <th>Hash Lookup</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookerModuleFileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.HookerModuleFileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.IIOCScore }}</td>
+                  <td>{{ item.RiskScore }}</td>
+                  <td>{{ item.KernelHookType }}</td>
+                  <td>{{ item.ObjectName }}</td>
+                  <td>{{ item.FunctionName }}</td>
+                  <td>{{ item.MachineCount }}</td>
+                  <td>{{ item.Signature }}</td>
+                  <td>{{ item.HashLookup }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data|by_key:"KernelHooks" %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.HookerModuleFileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.HookerModuleFileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.IIOCScore }}</td>
-                    <td>{{ item.RiskScore }}</td>
-                    <td>{{ item.KernelHookType }}</td>
-                    <td>{{ item.ObjectName }}</td>
-                    <td>{{ item.FunctionName }}</td>
-                    <td>{{ item.MachineCount }}</td>
-                    <td>{{ item.Signature }}</td>
-                    <td>{{ item.HashLookup }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="WindowsHooks_div">
-            <h3 class="wf-h3-style">Windows Hooks</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="WindowsHooks_div">
+          <h3 class="wf-h3-style">Windows Hooks</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>IIOC Score</th>
+                <th>Risk Score</th>
+                <th>Hooked Process</th>
+                <th>Hooked PID</th>
+                <th>Hooker PID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data|by_key:"WindowsHooks" %}
                 <tr>
-                  <th>File Name</th>
-                  <th>IIOC Score</th>
-                  <th>Risk Score</th>
-                  <th>Hooked Process</th>
-                  <th>Hooked PID</th>
-                  <th>Hooker PID</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.FileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.FileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.IIOCScore }}</td>
+                  <td>{{ item.RiskScore }}</td>
+                  <td>{{ item.HookedProcess }}</td>
+                  <td>{{ item.HookedPID }}</td>
+                  <td>{{ item.HookerPID }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data|by_key:"WindowsHooks" %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.FileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.FileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.IIOCScore }}</td>
-                    <td>{{ item.RiskScore }}</td>
-                    <td>{{ item.HookedProcess }}</td>
-                    <td>{{ item.HookedPID }}</td>
-                    <td>{{ item.HookerPID }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="SuspiciousThreads_div">
-            <h3 class="wf-h3-style">Suspicious Threads</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="SuspiciousThreads_div">
+          <h3 class="wf-h3-style">Suspicious Threads</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Process Context</th>
+                <th>Module Name</th>
+                <th>IIOC Score</th>
+                <th>Risk Score</th>
+                <th>Machine Count</th>
+                <th>Signature</th>
+                <th>Hash Lookup</th>
+                <th>File Creation Time</th>
+                <th>Full Path</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data|by_key:"SuspiciousThreads" %}
                 <tr>
-                  <th>Process Context</th>
-                  <th>Module Name</th>
-                  <th>IIOC Score</th>
-                  <th>Risk Score</th>
-                  <th>Machine Count</th>
-                  <th>Signature</th>
-                  <th>Hash Lookup</th>
-                  <th>File Creation Time</th>
-                  <th>Full Path</th>
+                  <td>{{ item.ProcessContext }}</td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.ModuleName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.ModuleName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.IIOCScore }}</td>
+                  <td>{{ item.RiskScore }}</td>
+                  <td>{{ item.MachineCount }}</td>
+                  <td>{{ item.Signature }}</td>
+                  <td>{{ item.HashLookup }}</td>
+                  <td>{{ item.FileCreationTime }}</td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ item.FullPath }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.FullPath }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data|by_key:"SuspiciousThreads" %}
-                  <tr>
-                    <td>{{ item.ProcessContext }}</td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.ModuleName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.ModuleName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.IIOCScore }}</td>
-                    <td>{{ item.RiskScore }}</td>
-                    <td>{{ item.MachineCount }}</td>
-                    <td>{{ item.Signature }}</td>
-                    <td>{{ item.HashLookup }}</td>
-                    <td>{{ item.FileCreationTime }}</td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ item.FullPath }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.FullPath }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="RegistryDiscrepancies_div">
-            <h3 class="wf-h3-style">Registry Discrepancies</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="RegistryDiscrepancies_div">
+          <h3 class="wf-h3-style">Registry Discrepancies</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Hive</th>
+                <th>Path</th>
+                <th>Data</th>
+                <th>Data Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data|by_key:"RegistryDiscrepancies" %}
                 <tr>
-                  <th>Hive</th>
-                  <th>Path</th>
-                  <th>Data</th>
-                  <th>Data Type</th>
+                  <td>{{ item.Hive }}</td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ item.Path }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.Path }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.Data }}</td>
+                  <td>{{ item.DataType }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data|by_key:"RegistryDiscrepancies" %}
-                  <tr>
-                    <td>{{ item.Hive }}</td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ item.Path }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.Path }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.Data }}</td>
-                    <td>{{ item.DataType }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="Network_div">
-            <h3 class="wf-h3-style">Network</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="Network_div">
+          <h3 class="wf-h3-style">Network</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Process</th>
+                <th>Module</th>
+                <th>IP</th>
+                <th>Domain</th>
+                <th>Port</th>
+                <th>Listen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data.Network %}
                 <tr>
-                  <th>Process</th>
-                  <th>Module</th>
-                  <th>IP</th>
-                  <th>Domain</th>
-                  <th>Port</th>
-                  <th>Listen</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ item.Process }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.Process }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.ModuleName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.ModuleName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ item.IP }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.IP }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': [' domain '], 'value': '{{ item.Domain }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.Domain }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.Port }}</td>
+                  <td>{{ item.Listen }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data.Network %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ item.Process }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.Process }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.ModuleName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.ModuleName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ item.IP }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.IP }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': [' domain '], 'value': '{{ item.Domain }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.Domain }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.Port }}</td>
-                    <td>{{ item.Listen }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="show_detail" id="Tracking_div">
-            <h3 class="wf-h3-style">Tracking</h3>
-            <table class="wf-table-horizontal datatable">
-              <thead>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="show_detail" id="Tracking_div">
+          <h3 class="wf-h3-style">Tracking</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Source File Name</th>
+                <th>Event</th>
+                <th>Target</th>
+                <th>IIOC Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in result.data.Tracking %}
                 <tr>
-                  <th>Source File Name</th>
-                  <th>Event</th>
-                  <th>Target</th>
-                  <th>IIOC Score</th>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.SourceFileName }}' }], 0, {{ container.id }}, null, false);">
+                      {{ item.SourceFileName }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ item.Event }}</td>
+                  <td>{{ item.Target }}</td>
+                  <td>{{ item.IIOCScore }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for item in result.data.Tracking %}
-                  <tr>
-                    <td>
-                      <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ item.SourceFileName }}' }], 0, {{ container.id }}, null, false);">
-                        {{ item.SourceFileName }}
-                        &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                      </a>
-                    </td>
-                    <td>{{ item.Event }}</td>
-                    <td>{{ item.Target }}</td>
-                    <td>{{ item.IIOCScore }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    <script>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <script>
 $.extend(true, $.fn.dataTable.defaults, {
     "searching": true,
     "bLengthChange": false,
@@ -754,5 +754,5 @@ $.extend(true, $.fn.dataTable.defaults, {
     $('.show_detail').hide();
     $('#'+id+'_div').show();
   }
-    </script>
-  {% endblock %}
+  </script>
+{% endblock %}
