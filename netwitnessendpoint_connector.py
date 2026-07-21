@@ -18,9 +18,11 @@
 import hashlib
 import ipaddress
 import json
+import unicodedata
 from urllib.parse import quote
 
 # Phantom imports
+import idna
 import phantom.app as phantom
 import requests
 from dateutil.parser import parse
@@ -146,6 +148,12 @@ class NetwitnessendpointConnector(BaseConnector):
                 return None
 
         return parameter
+
+    @staticmethod
+    def _strip_format_controls(value):
+        if isinstance(value, str):
+            return "".join(character for character in value if unicodedata.category(character) != "Cf")
+        return value
 
     def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
         """Function that makes the REST call to the device. It is a generic function that can be called from various
@@ -274,8 +282,6 @@ class NetwitnessendpointConnector(BaseConnector):
         # Variable that will be used to fetch specific amount of information from the response
         pending_data_length = limit
         max_pages = consts.NWENDPOINT_DEFAULT_MAX_PAGES
-        if limit_provided:
-            max_pages = min(max_pages, max(1, (limit + consts.NWENDPOINT_DEFAULT_LIMIT - 1) // consts.NWENDPOINT_DEFAULT_LIMIT))
 
         for page_count in range(1, max_pages + 1):
             # Making the call
@@ -285,15 +291,16 @@ class NetwitnessendpointConnector(BaseConnector):
             if phantom.is_fail(response_status):
                 return action_result.get_status(), None
 
-            if response[consts.NWENDPOINT_REST_RESPONSE].get(key):
-                return_list += response[consts.NWENDPOINT_REST_RESPONSE][key][:pending_data_length]
+            page_data = response[consts.NWENDPOINT_REST_RESPONSE].get(key, [])
+            received_data_length = len(page_data)
+            return_list += page_data[:pending_data_length]
 
             if limit_provided:
                 if len(return_list) >= limit:
                     break
 
                 # next expected amount of information to fetch from the response
-                pending_data_length -= consts.NWENDPOINT_DEFAULT_LIMIT
+                pending_data_length -= received_data_length
 
             params["page"] += 1
 
@@ -415,8 +422,12 @@ class NetwitnessendpointConnector(BaseConnector):
         domain = param[consts.NWENDPOINT_JSON_DOMAIN]
 
         # Convert URL to domain
-        if phantom.is_url(domain):
-            domain = phantom.get_host_from_url(domain)
+        try:
+            if phantom.is_url(domain):
+                domain = phantom.get_host_from_url(domain)
+            domain = idna.encode(domain, uts46=True).decode("ascii")
+        except (ValueError, idna.IDNAError):
+            return action_result.set_status(phantom.APP_ERROR, "Provide a valid domain or URL")
 
         # Get mandatory parameter
         payload = {"Domains": [domain]}
@@ -917,16 +928,18 @@ class NetwitnessendpointConnector(BaseConnector):
             )
             source_data_identifiers = []
             # Creating container
+            ioc_name = self._strip_format_controls(ioc["Name"])
+            ioc_type = self._strip_format_controls(ioc["Type"])
             container = {
-                "name": "{}-{}".format(ioc["Name"], ioc["Type"]),
-                "description": ioc["Description"],
+                "name": f"{ioc_name}-{ioc_type}",
+                "description": self._strip_format_controls(ioc["Description"]),
                 "data": json.dumps(ioc),
-                "source_data_identifier": "{}-{}".format(ioc["Name"], ioc["Type"]),
+                "source_data_identifier": f"{ioc_name}-{ioc_type}",
             }
 
             self.send_progress("Ingesting data for: {}".format(ioc["Name"]))
 
-            ret_value, response, container_id = self.save_container(container)
+            ret_value, _response, container_id = self.save_container(container)
 
             # Something went wrong while creating container
             if phantom.is_fail(ret_value):
@@ -941,7 +954,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 for field, artifact_details in machine_artifacts_mappings.items():
                     # if field value is present
                     if machine.get(field):
-                        cef_value = machine[field]
+                        cef_value = self._strip_format_controls(machine[field])
 
                         cef[artifact_details["cef"]] = cef_value
                         cef_types[artifact_details["cef"]] = artifact_details["cef_types"]
@@ -968,7 +981,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 # The source_data_identifier should be created after all the keys have been set
                 artifact["source_data_identifier"] = source_data_identifier
-                ret_value, status_string, artifact_id = self.save_artifact(artifact)
+                ret_value, status_string, _artifact_id = self.save_artifact(artifact)
 
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
@@ -986,7 +999,7 @@ class NetwitnessendpointConnector(BaseConnector):
                     # if field value is present
                     machine_field = machine_module.get(field)
                     if machine_field:
-                        cef_value = machine_field
+                        cef_value = self._strip_format_controls(machine_field)
 
                         cef[artifact_details["cef"]] = cef_value
                         cef_types[artifact_details["cef"]] = artifact_details["cef_types"]
@@ -1013,7 +1026,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
                 # The source_data_identifier should be created after all the keys have been set.
                 artifact["source_data_identifier"] = source_data_identifier
-                ret_value, status_string, artifact_id = self.save_artifact(artifact)
+                ret_value, status_string, _artifact_id = self.save_artifact(artifact)
 
                 # Something went wrong while creating artifacts
                 if phantom.is_fail(ret_value):
@@ -1023,11 +1036,16 @@ class NetwitnessendpointConnector(BaseConnector):
                     continue
 
             # Adding IIOC details as artifact
-            cef = {"instantIocName": ioc["Name"], "lastExecutedTime": ioc["LastExecuted"], "iocLevel": ioc["IOCLevel"], "osType": ioc["Type"]}
+            cef = {
+                "instantIocName": ioc_name,
+                "lastExecutedTime": self._strip_format_controls(ioc["LastExecuted"]),
+                "iocLevel": self._strip_format_controls(ioc["IOCLevel"]),
+                "osType": ioc_type,
+            }
 
             # If Module type is found in IOC, then it will be added to the artifact
             if ioc.get("ioc_type"):
-                cef["iocType"] = ioc["ioc_type"]
+                cef["iocType"] = self._strip_format_controls(ioc["ioc_type"])
 
             cef_types = {"instantIocName": ["nwe ioc name"]}
 
@@ -1040,7 +1058,7 @@ class NetwitnessendpointConnector(BaseConnector):
                 "run_automation": True,
             }
             artifact["source_data_identifier"] = self._create_dict_hash(artifact)
-            ret_value, status_string, artifact_id = self.save_artifact(artifact)
+            ret_value, status_string, _artifact_id = self.save_artifact(artifact)
 
             # Something went wrong while creating artifacts
             if phantom.is_fail(ret_value):
@@ -1308,7 +1326,7 @@ class NetwitnessendpointConnector(BaseConnector):
         self.save_progress(f"Configured URL: {self._url}")
 
         # making call
-        ret_value, response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result, method="get", timeout=300)
+        ret_value, _response = self._make_rest_call(consts.NWENDPOINT_TEST_CONNECTIVITY_ENDPOINT, action_result, method="get", timeout=300)
 
         # something went wrong
         if phantom.is_fail(ret_value):
