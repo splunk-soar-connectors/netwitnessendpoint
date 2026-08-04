@@ -917,7 +917,7 @@ class NetwitnessendpointConnector(BaseConnector):
         }
 
         # mapping of IOCScore with severity of artifacts
-        phantom_severity_mapping = {"0": "high", "1": "medium", "2": "low", "3": "low"}
+        phantom_severity_mapping = {"0": "high", "1": "high", "2": "medium", "3": "low"}
         successfully_ingested_queries = set()
         save_failure_count = 0
 
