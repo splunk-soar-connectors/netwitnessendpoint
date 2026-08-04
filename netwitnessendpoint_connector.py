@@ -186,8 +186,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         kwargs = {"data": data, "params": params, "auth": (self._username, self._password), "verify": self._verify_server_cert}
 
-        if timeout is not None:
-            kwargs["timeout"] = timeout
+        kwargs["timeout"] = timeout if timeout is not None else consts.NWENDPOINT_DEFAULT_REQUEST_TIMEOUT
 
         # If API will result an unauthorized error, then API will be executed for maximum thrice
         for api_execution_trial in range(0, 3):
