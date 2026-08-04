@@ -601,9 +601,13 @@ class NetwitnessendpointConnector(BaseConnector):
             action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), "cpu_min"
         )
 
-        scan_category = SCAN_CATEGORY_MAPPING.get(
-            param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY, param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY))
-        )
+        scan_category_input = param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY, consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)
+        scan_category = SCAN_CATEGORY_MAPPING.get(scan_category_input)
+        if scan_category is None:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Invalid scan_category '{}'. Valid values: {}".format(scan_category_input, ", ".join(SCAN_CATEGORY_MAPPING)),
+            )
         if cpu_max is None or cpu_max_vm is None or cpu_min is None:
             return action_result.set_status(phantom.APP_ERROR)
 
