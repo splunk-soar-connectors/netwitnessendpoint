@@ -19,6 +19,7 @@ import hashlib
 import ipaddress
 import json
 import unicodedata
+from datetime import datetime, timezone
 from urllib.parse import quote
 
 # Phantom imports
@@ -155,6 +156,16 @@ class NetwitnessendpointConnector(BaseConnector):
             return "".join(character for character in value if unicodedata.category(character) != "Cf")
         return value
 
+    def _last_executed_sort_key(self, item):
+        try:
+            last_executed = parse(item.get("LastExecuted"))
+            if last_executed.tzinfo is None:
+                return last_executed.replace(tzinfo=timezone.utc)
+            return last_executed.astimezone(timezone.utc)
+        except (TypeError, ValueError, OverflowError) as e:
+            self.debug_print("Sorting IOC with invalid LastExecuted last", item.get("Name"), e)
+            return datetime.min.replace(tzinfo=timezone.utc)
+
     def _make_rest_call(self, endpoint, action_result, params=None, data=None, method="post", timeout=None):
         """Function that makes the REST call to the device. It is a generic function that can be called from various
         action handlers.
@@ -186,8 +197,7 @@ class NetwitnessendpointConnector(BaseConnector):
 
         kwargs = {"data": data, "params": params, "auth": (self._username, self._password), "verify": self._verify_server_cert}
 
-        if timeout is not None:
-            kwargs["timeout"] = timeout
+        kwargs["timeout"] = timeout if timeout is not None else consts.NWENDPOINT_DEFAULT_REQUEST_TIMEOUT
 
         # If API will result an unauthorized error, then API will be executed for maximum thrice
         for api_execution_trial in range(0, 3):
@@ -601,9 +611,13 @@ class NetwitnessendpointConnector(BaseConnector):
             action_result, param.get(consts.NWENDPOINT_JSON_CPUMIN, consts.NWENDPOINT_DEFAULT_MIN_CPU_VALUE), "cpu_min"
         )
 
-        scan_category = SCAN_CATEGORY_MAPPING.get(
-            param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY, param.get(consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY))
-        )
+        scan_category_input = param.get(consts.NWENDPOINT_JSON_SCAN_CATEGORY, consts.NWENDPOINT_DEFAULT_SCAN_CATEGORY)
+        scan_category = SCAN_CATEGORY_MAPPING.get(scan_category_input)
+        if scan_category is None:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Invalid scan_category '{}'. Valid values: {}".format(scan_category_input, ", ".join(SCAN_CATEGORY_MAPPING)),
+            )
         if cpu_max is None or cpu_max_vm is None or cpu_min is None:
             return action_result.set_status(phantom.APP_ERROR)
 
@@ -913,7 +927,7 @@ class NetwitnessendpointConnector(BaseConnector):
         }
 
         # mapping of IOCScore with severity of artifacts
-        phantom_severity_mapping = {"0": "high", "1": "medium", "2": "low", "3": "low"}
+        phantom_severity_mapping = {"0": "high", "1": "high", "2": "medium", "3": "low"}
         successfully_ingested_queries = set()
         save_failure_count = 0
 
@@ -1285,7 +1299,7 @@ class NetwitnessendpointConnector(BaseConnector):
                         break
 
         # Sorting list of IOCs based on its last executed time
-        instant_iocs.sort(key=lambda item: parse(item["LastExecuted"]), reverse=True)
+        instant_iocs.sort(key=self._last_executed_sort_key, reverse=True)
 
         # Manual ingestion and Scheduled ingestion
         if source_ids is None:

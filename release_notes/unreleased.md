@@ -1,1 +1,6 @@
 **Unreleased**
+
+* Apply the documented All scan category by default and reject unsupported scan category values instead of silently omitting them.
+* Align ingested artifact severities with the documented NetWitness IOC levels.
+* Bound NetWitness REST requests to prevent unresponsive endpoints from indefinitely blocking action workers.
+* Handle missing, malformed, and timezone-inconsistent IOC execution timestamps without aborting poll ingestion.
